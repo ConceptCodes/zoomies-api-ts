@@ -1,0 +1,10 @@
+FROM node:16.5.0-alpine 
+WORKDIR /usr/src/app
+RUN apk add yarn
+RUN yarn global add nodemon
+COPY package.json nodemon.json yarn.lock ./
+RUN yarn install 
+COPY ./ ./
+EXPOSE 8000
+CMD ["yarn","dev"]
+

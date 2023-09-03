@@ -1,0 +1,34 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1693626933731,
+      "tag": "0000_oval_next_avengers",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1693633280726,
+      "tag": "0001_concerned_nebula",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1693659391784,
+      "tag": "0002_yielding_lockjaw",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1693662795269,
+      "tag": "0003_superb_diamondback",
+      "breakpoints": true
+    }
+  ]
+}
