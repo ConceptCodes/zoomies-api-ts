@@ -11,7 +11,7 @@ class HealthController {
     next: NextFunction
   ) => {
     try {
-      res.status(StatusCodes.OK).json({ message: "Service is healthy" });
+      res.status(StatusCodes.OK).json({ message: "PONG" });
     } catch (err) {
       next(err);
     }
