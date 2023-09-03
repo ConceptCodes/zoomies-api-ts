@@ -8,7 +8,9 @@
 
 <br />
 <div align="center">
-<h1 align="center">Pet Grooming API</h1>
+<h1 align="center">
+  Zoomies API 🐶
+</h1>
   <p align="center">
     <a href="https://github.com/conceptcodes/zoomies-api/issues">Report Bug</a>
     ·
