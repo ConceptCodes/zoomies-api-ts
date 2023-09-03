@@ -1,5 +1,5 @@
 export enum Services {
-  PLANET_SCALE = "PlanetScale",
+  DATABASE = "Database",
   RESEND = "Resend",
 }
 

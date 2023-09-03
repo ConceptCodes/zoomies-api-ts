@@ -1,8 +1,9 @@
 import { Router } from "express";
+import { Services } from "./enums";
 
 export interface IHealthStatus {
-  service: string;
-  isConnected: boolean;
+  service: keyof typeof Services;
+  connected: boolean;
 }
 
 export interface Routes {
