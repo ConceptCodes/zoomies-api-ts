@@ -75,9 +75,9 @@ Welcome to the Pet Grooming API! This API provides a robust solution for pet own
 
 Before you begin, ensure you have met the following requirements:
 
-- [Node.js](https://nodejs.org/) (Recommended version: [insert version])
-- [NPM or Yarn](https://yarnpkg.com/) (Recommended version: [insert version])
-- [PostgreSQL](https://www.postgresql.org/) (Recommended version: [insert version])
+- [Node.js](https://nodejs.org/) (Recommended version: 16+)
+- [NPM or Yarn](https://yarnpkg.com/) (Recommended version: 1.22.x)
+- [PostgreSQL](https://www.postgresql.org/) (Recommended version: 13+)
 
 ### Installation
 
@@ -174,5 +174,4 @@ Project Link: [https://github.com/conceptcodes/zoomies-api](https://github.com/c
 [issues-shield]: https://img.shields.io/github/issues/conceptcodes/zoomies-api.svg?style=for-the-badge
 [issues-url]: https://github.com/conceptcodes/zoomies-api/issues
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://www.linkedin.com/in/your-profile/
-[product-screenshot]: public/screenshot.png
+[linkedin-url]: https://www.linkedin.com/in/david-ojo-66a12a147/
