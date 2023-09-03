@@ -10,8 +10,6 @@
 <div align="center">
 <h1 align="center">Pet Grooming API</h1>
   <p align="center">
-    <a href="https://your-api-url.com">View Demo</a>
-    ·
     <a href="https://github.com/conceptcodes/zoomies-api/issues">Report Bug</a>
     ·
     <a href="https://github.com/conceptcodes/zoomies-api/issues">Request Feature</a>
