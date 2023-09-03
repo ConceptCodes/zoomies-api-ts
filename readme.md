@@ -122,7 +122,28 @@ To get this API up and running, follow these steps:
    yarn dev
    ```
 
-7. Open [http://localhost:8000](http://localhost:8000) in your browser to interact with the API.
+   If everything works as expected, you should see the following message in your terminal:
+
+   ```sh
+   =====================================================
+   ================= ENV: local ========================
+   ===== Zoomies Api listening on PORT: 8000 ===========
+   =====================================================
+   ```
+
+7. Make a request to our health check endpoint:
+
+   ```sh
+   curl http://localhost:8000/api/health/alive
+   ```
+
+   you should see the following response:
+
+   ```json
+   {
+     "message": "PONG"
+   }
+   ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
