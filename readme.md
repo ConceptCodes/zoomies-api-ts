@@ -12,9 +12,9 @@
   Zoomies API 🐶
 </h1>
   <p align="center">
-    <a href="https://github.com/conceptcodes/zoomies-api/issues">Report Bug</a>
+    <a href="https://github.com/conceptcodes/zoomies-api-ts/issues">Report Bug</a>
     ·
-    <a href="https://github.com/conceptcodes/zoomies-api/issues">Request Feature</a>
+    <a href="https://github.com/conceptcodes/zoomies-api-ts/issues">Request Feature</a>
   </p>
 </div>
 
@@ -43,27 +43,31 @@
 
 ## About The Project
 
-Welcome to the Pet Grooming API! This API provides a robust solution for pet owners, groomers, and administrators to manage pet grooming appointments seamlessly. It's designed to make pet grooming scheduling efficient and user-friendly.
+Zoomies is a robust API designed to streamline pet appointment management for businesses, pet owners, and veterinarians. This API provides a seamless solution for scheduling, managing, and tracking pet appointments, ensuring a smooth experience for all users.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
 
-- ![NodeJS [Node.js](https://nodejs.org/)](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
+- ![Bun [Bun](https://bun.sh)](https://img.shields.io/badge/bun-FFA500?style=for-the-badge&logo=bun&logoColor=white)
 - ![TypeScript [TypeScript](https://www.typescriptlang.org/)](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
 - ![Express.js [Express.js](https://expressjs.com/)](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)
 - ![PostgreSQL [PostgreSQL](https://www.postgresql.org/)](https://img.shields.io/badge/postgresql-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 - ![Docker [Docker](https://www.docker.com/)](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
-- ![Jest [Jest](https://jestjs.io/)](https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white)
-- [Other dependencies or technologies]
+- ![Drizzle Orm [Drizzle Orm](https://drizzle-orm.github.io/)](https://img.shields.io/badge/Drizzle%20Orm-FFA500?style=for-the-badge&logo=drizzle-orm&logoColor=white)
+
 
 ### Features
 
-- User Registration and Authentication
-- Pet Management
-- Appointment Scheduling
-- Groomer Availability Management (if applicable)
-- [Checkout Wiki](https://github.com/conceptcodes/zoomies-api/wiki) for more details
+- **User Management**: Create and manage user accounts for pet owners, vets, and administrators
+- **Pet Management**: Support for various pet types, breeds, and characteristics
+- **Service Management**: Define and manage services offered by vets, including pricing and availability
+- **Real-time Updates**: Stay informed with instant notifications and updates
+- **Appointment Scheduling**: Easy booking and management of appointments, including reminders and notifications
+- **Reporting and Analytics**: Track appointment history, revenue, and user engagement (Coming Soon)
+- **Payment Integration**: Seamless payment processing for services rendered (Coming Soon)
+- [Checkout Wiki](https://github.com/conceptcodes/zoomies-api-ts/wiki) for more details
+
 
 ### What I Learned ?
 
@@ -76,7 +80,7 @@ Welcome to the Pet Grooming API! This API provides a robust solution for pet own
 Before you begin, ensure you have met the following requirements:
 
 - [Node.js](https://nodejs.org/) (Recommended version: 16+)
-- [NPM or Yarn](https://yarnpkg.com/) (Recommended version: 1.22.x)
+- [Bun](https://bun.sh) (Any package manager can be used)
 - [PostgreSQL](https://www.postgresql.org/) (Recommended version: 13+)
 
 ### Installation
@@ -86,19 +90,19 @@ To get this API up and running, follow these steps:
 1. Clone the repo:
 
    ```sh
-    git clone https://github.com/conceptcodes/zoomies-api.git
+    git clone https://github.com/conceptcodes/zoomies-api-ts.git
    ```
 
 2. Navigate to the project directory:
 
    ```sh
-   cd repo-name
+   cd zoomies-api-ts
    ```
 
 3. Install dependencies:
 
    ```sh
-   yarn install
+   bun install
    ```
 
 4. Configure environment variables:
@@ -107,19 +111,19 @@ To get this API up and running, follow these steps:
    - Fill in the required configuration values.
 
    ```sh
-   cp .env.example .env
+   touch .env && cp .env.example .env
    ```
 
 5. Run DB Migration:
 
    ```sh
-   yarn db:generate && yarn db:migrate
+   bun run db:generate && bun run db:migrate
    ```
 
 6. Start the server:
 
    ```sh
-   yarn dev
+   bun run dev
    ```
 
    If everything works as expected, you should see the following message in your terminal:
@@ -149,12 +153,12 @@ To get this API up and running, follow these steps:
 
 ## Roadmap
 
-- [ ] [Feature or task 1]
-- [ ] [Feature or task 2]
-- [ ] [Feature or task 3]
-- [ ] [Feature or task 4]
+- [ ] Add Unit and Integration Tests
+- [ ] Implement CI/CD Pipeline
+- [ ] Add a logging system
 
-See the [open issues](https://github.com/conceptcodes/zoomies-api/issues) for a full list of proposed features and known issues.
+
+See the [open issues](https://github.com/conceptcodes/zoomies-api-ts/issues) for a full list of proposed features and known issues.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -182,17 +186,17 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 [David Ojo] - [@conceptcodes] - [conceptcodes@gmail.com]
 
-Project Link: [https://github.com/conceptcodes/zoomies-api](https://github.com/conceptcodes/zoomies-api)
+Project Link: [https://github.com/conceptcodes/zoomies-api-ts](https://github.com/conceptcodes/zoomies-api-ts/wiki)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-[contributors-shield]: https://img.shields.io/github/contributors/conceptcodes/zoomies-api.svg?style=for-the-badge
-[contributors-url]: https://github.com/conceptcodes/zoomies-api/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/conceptcodes/zoomies-api.svg?style=for-the-badge
-[forks-url]: https://github.com/conceptcodes/zoomies-api/network/members
-[stars-shield]: https://img.shields.io/github/stars/conceptcodes/zoomies-api.svg?style=for-the-badge
-[stars-url]: https://github.com/conceptcodes/zoomies-api/stargazers
-[issues-shield]: https://img.shields.io/github/issues/conceptcodes/zoomies-api.svg?style=for-the-badge
-[issues-url]: https://github.com/conceptcodes/zoomies-api/issues
+[contributors-shield]: https://img.shields.io/github/contributors/conceptcodes/zoomies-api-ts.svg?style=for-the-badge
+[contributors-url]: https://github.com/conceptcodes/zoomies-api-ts/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/conceptcodes/zoomies-api-ts.svg?style=for-the-badge
+[forks-url]: https://github.com/conceptcodes/zoomies-api-ts/network/members
+[stars-shield]: https://img.shields.io/github/stars/conceptcodes/zoomies-api-ts.svg?style=for-the-badge
+[stars-url]: https://github.com/conceptcodes/zoomies-api-ts/stargazers
+[issues-shield]: https://img.shields.io/github/issues/conceptcodes/zoomies-api-ts.svg?style=for-the-badge
+[issues-url]: https://github.com/conceptcodes/zoomies-api-ts/issues
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/david-ojo-66a12a147/
