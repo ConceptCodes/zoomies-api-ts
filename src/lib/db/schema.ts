@@ -7,6 +7,7 @@ import {
   integer,
   pgEnum,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 
 import { env } from "@lib/env";
@@ -52,7 +53,10 @@ export const vetTable = pgTable("vet", {
   userId: integer("user_id")
     .notNull()
     .references(() => userTable.id),
-  type: PetTypeSchema("type").notNull().default("UNKNOWN"),
+  allowedPetTypes: PetTypeSchema("type")
+    .array()
+    .notNull()
+    .default(sql`'{}'::pet_type[]`),
   startHour: integer("start_hour").notNull().default(9),
   endHour: integer("end_hour").notNull().default(17),
   days: integer("days").notNull().default(5),

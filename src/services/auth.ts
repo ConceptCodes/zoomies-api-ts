@@ -94,8 +94,6 @@ export default class AuthService {
       const { email, password, fullName, phoneNumber } = data;
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      console.log("hashedPassword", hashedPassword);
-
       const user = await db
         .insert(userTable)
         .values({

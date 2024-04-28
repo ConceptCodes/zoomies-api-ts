@@ -24,7 +24,9 @@ export default class AuthController {
         sameSite: "none",
       });
 
-      res.status(StatusCodes.OK).json({ token });
+      res.header("Authorization", `Bearer ${token}`);
+
+      res.status(StatusCodes.OK).send();
     } catch (err) {
       next(err);
     }
@@ -40,7 +42,9 @@ export default class AuthController {
         sameSite: "none",
       });
 
-      res.status(StatusCodes.CREATED).json({ token });
+      res.header("Authorization", `Bearer ${token}`);
+
+      res.status(StatusCodes.CREATED).send();
     } catch (err) {
       next(err);
     }

@@ -20,7 +20,7 @@ class App {
   constructor(routes: Routes[]) {
     this.app = express();
     this.port = env.PORT;
-    this.env = env.NODE_ENV || "development";
+    this.env = env.NODE_ENV || "production";
 
     this.initializeMiddlewares();
     this.initializeRoutes(routes);
@@ -38,6 +38,7 @@ class App {
       console.info("=====================================================");
     });
   }
+
   public getServer(): express.Application {
     return this.app;
   }

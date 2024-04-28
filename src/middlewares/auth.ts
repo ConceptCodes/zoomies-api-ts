@@ -1,5 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
-import jwt_decode from "jwt-decode";
+import jwt_decode, { InvalidTokenError } from "jwt-decode";
 
 import { UserPayload } from "@/constants";
 import { InvalidRole } from "@/exceptions";
@@ -11,13 +11,16 @@ const authMiddleware = async (
   next: NextFunction
 ) => {
   try {
-    const payload = req.get("x-access-token");
-    if (payload) {
+    let payload = req.get("Authorization");
+    if (payload && payload.startsWith("Bearer ")) {
+      payload = payload.slice(7, payload.length);
       const _token: UserPayload = jwt_decode(payload, {
         header: true,
       });
-      if (_token) {
+      if (_token && _token.id && _token.role) {
         req.user = { id: _token.id, role: _token.role };
+      } else {
+        throw new InvalidTokenError();
       }
     }
     next();

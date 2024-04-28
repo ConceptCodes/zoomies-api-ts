@@ -39,11 +39,11 @@ export const resetPasswordSchema = insertUserSchema.pick({
 export const updateSchema = createInsertSchema(userTable, {
   id: (schema) => schema.id.positive(),
   fullName: (schema) => schema.fullName.max(255),
-  phoneNumber: (schema) => schema.phoneNumber.regex(/^\d{10}$/),
+  // phoneNumber: (schema) => schema.phoneNumber.regex(/^\d{10}$/),
 }).pick({
   id: true,
   fullName: true,
-  phoneNumber: true,
+  // phoneNumber: true,
 });
 
 // Pet
@@ -70,7 +70,6 @@ export const updatePetSchema = insertPetSchema.pick({
   ownerId: true,
   name: true,
   type: true,
-  breed: true,
   age: true,
 });
 
@@ -108,8 +107,6 @@ export const updateAppointmentSchema = insertAppointmentSchema.pick({
   petId: true,
   serviceId: true,
   date: true,
-  time: true,
-  status: true,
 });
 
 export const getOneAppointmentSchema = insertAppointmentSchema.pick({

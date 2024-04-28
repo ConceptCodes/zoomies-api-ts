@@ -32,7 +32,7 @@ export default class ProfileService {
 
   public async update(data: Required<UpdateSchema>): Promise<void> {
     try {
-      const { fullName, phoneNumber, id } = data;
+      const { fullName, id } = data;
 
       const tmp = await db
         .select()
@@ -46,7 +46,6 @@ export default class ProfileService {
         .update(userTable)
         .set({
           fullName,
-          phoneNumber,
         })
         .where(eq(userTable.id, id));
     } catch (err) {

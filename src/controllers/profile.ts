@@ -14,7 +14,7 @@ export default class ProfileController {
     this.service = new ProfileService();
   }
 
-  public get = async (req: Request, res: Response, next: NextFunction) => {
+  public getProfile = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = await this.service.get(req.user.id);
       res.status(StatusCodes.OK).json(user);
@@ -36,13 +36,13 @@ export default class ProfileController {
     }
   }
 
-  public update = async (req: Request, res: Response, next: NextFunction) => {
+  // Note: should we allow the user to update their phone number & email without verification? 
+  public updateProfile = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.user;
-      const { phoneNumber, fullName } = req.body;
+      const { fullName } = req.body;
       await this.service.update({
         id,
-        phoneNumber,
         fullName,
       });
       res.status(StatusCodes.OK).send();
@@ -51,13 +51,4 @@ export default class ProfileController {
     }
   };
 
-  public delete = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { id } = req.user;
-      await this.service.delete(id);
-      res.status(StatusCodes.OK).send();
-    } catch (err) {
-      next(err);
-    }
-  };
 }

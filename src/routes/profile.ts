@@ -15,12 +15,11 @@ export default class ProfileRoute implements Routes {
   }
 
   private initializeRoutes(): void {
-    this.router.get(`${this.path}/`, this.controller.get);
+    this.router.get(`${this.path}/`, this.controller.getProfile);
     this.router.patch(
       `${this.path}/`,
       ValidationMiddleware(updateSchema),
-      this.controller.update
+      this.controller.updateProfile
     );
-    this.router.delete(`${this.path}/`, this.controller.delete);
   }
 }
