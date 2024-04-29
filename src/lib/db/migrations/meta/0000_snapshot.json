@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "pg",
-  "id": "0d2fe26a-943b-4942-889c-d5f0bb6dc10c",
+  "id": "6a1735e2-35bd-48d5-9ea8-a462c3eb1092",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "appointment": {
@@ -232,7 +232,7 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "default": 10
+          "default": 100
         },
         "created_at": {
           "name": "created_at",
@@ -410,8 +410,7 @@
           "name": "type",
           "type": "species[]",
           "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::text[]"
+          "notNull": true
         },
         "start_hour": {
           "name": "start_hour",
@@ -469,7 +468,26 @@
       "uniqueConstraints": {}
     }
   },
-  "enums": {},
+  "enums": {
+    "species": {
+      "name": "species",
+      "values": {
+        "dog": "dog",
+        "cat": "cat",
+        "bird": "bird",
+        "hamster": "hamster",
+        "unknown": "unknown",
+        "fish": "fish",
+        "rabbit": "rabbit",
+        "turtle": "turtle",
+        "snake": "snake",
+        "lizard": "lizard",
+        "guinea_pig": "guinea_pig",
+        "horse": "horse",
+        "goat": "goat"
+      }
+    }
+  },
   "schemas": {},
   "_meta": {
     "schemas": {},

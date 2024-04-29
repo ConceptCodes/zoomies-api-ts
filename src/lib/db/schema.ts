@@ -30,7 +30,7 @@ export type User = typeof userTable.$inferSelect;
 export type NewUser = typeof userTable.$inferInsert;
 export const insertUserSchema = createInsertSchema(userTable);
 
-const PetTypeSEnum = pgEnum("species", [
+const species = [
   "dog",
   "cat",
   "bird",
@@ -44,7 +44,10 @@ const PetTypeSEnum = pgEnum("species", [
   "guinea_pig",
   "horse",
   "goat",
-]);
+] as const;
+export type Species = (typeof species)[number];
+
+export const PetTypeSEnum = pgEnum("species", species);
 
 export const vetTable = pgTable("vet", {
   id: serial("id").notNull().primaryKey(),
@@ -84,7 +87,7 @@ export const serviceTable = pgTable("service", {
   name: text("name").notNull(),
   description: text("description"),
   applicablePetTypes: PetTypeSEnum("applicable_pet_type").array().notNull(),
-  price: integer("price").notNull().default(10),
+  price: integer("price").notNull().default(100),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

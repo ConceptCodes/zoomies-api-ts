@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1714353698222,
-      "tag": "0000_supreme_mockingbird",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1714353750969,
-      "tag": "0001_dapper_epoch",
+      "when": 1714356050081,
+      "tag": "0000_bumpy_molecule_man",
       "breakpoints": true
     }
   ]

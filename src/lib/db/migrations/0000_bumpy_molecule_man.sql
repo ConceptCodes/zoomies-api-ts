@@ -1,3 +1,9 @@
+DO $$ BEGIN
+ CREATE TYPE "species" AS ENUM('dog', 'cat', 'bird', 'hamster', 'unknown', 'fish', 'rabbit', 'turtle', 'snake', 'lizard', 'guinea_pig', 'horse', 'goat');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "appointment" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"pet_id" integer NOT NULL,
@@ -26,7 +32,7 @@ CREATE TABLE IF NOT EXISTS "service" (
 	"name" text NOT NULL,
 	"description" text,
 	"applicable_pet_type" species[] NOT NULL,
-	"price" integer DEFAULT 10 NOT NULL,
+	"price" integer DEFAULT 100 NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -56,7 +62,7 @@ CREATE TABLE IF NOT EXISTS "user" (
 CREATE TABLE IF NOT EXISTS "vet" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" integer NOT NULL,
-	"type" species[] DEFAULT '{}'::text[] NOT NULL,
+	"type" species[] NOT NULL,
 	"start_hour" integer DEFAULT 9 NOT NULL,
 	"end_hour" integer DEFAULT 17 NOT NULL,
 	"days" integer DEFAULT 5 NOT NULL,

@@ -28,7 +28,13 @@ export default class ServiceService {
 
   public async create(data: CreateServiceSchema): Promise<Service> {
     try {
-      const service = await db.insert(serviceTable).values(data).returning();
+      const service = await db
+        .insert(serviceTable)
+        .values({
+          ...data,
+          applicablePetTypes: data.applicablePetTypes as any, // TODO: Fix this
+        })
+        .returning();
       return service[0];
     } catch (err) {
       throw err;

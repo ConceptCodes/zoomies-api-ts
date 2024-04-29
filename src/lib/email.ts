@@ -2,6 +2,7 @@ import { Resend } from "resend";
 import { env } from "@lib/env";
 import path from "path";
 import fs from "fs";
+import xss from "xss";
 
 const resend = new Resend(env.RESEND_API_KEY);
 
@@ -17,7 +18,7 @@ export type WelcomeEmailData = {
 
 export type ResetPasswordEmailData = VerifyEmailData;
 
-type EmailTemplates = {
+type Email = {
   [key: string]: {
     subject: string;
     component: (data: Data) => string;
@@ -35,7 +36,7 @@ const loadTemplate = (name: string, args: Record<string, string>): string => {
   });
 };
 
-const templates: EmailTemplates = {
+const templates: Email = {
   welcome: {
     subject: "Welcome to Zoomies",
     component: (data) => {
@@ -56,27 +57,27 @@ const templates: EmailTemplates = {
   // },
 };
 
-export async function sendEmail<T extends keyof typeof templates>(
-  email: string,
-  template: T,
-  data: Data
-) {
+export type Template = keyof typeof templates;
+
+export async function sendEmail(email: string, template: Template, data: Data) {
   try {
     const subject = templates[template].subject;
-    const html = templates[template].component(data);
+    let html = templates[template].component(data);
+    html = xss(html);
 
-    // verify email is valid
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       throw new Error("Invalid email address");
     }
 
-    await resend.emails.send({
-      from: "Zoomies <support@zoomies.dev>",
+    const res = await resend.emails.send({
+      from: "Zoomies <support@ekaaro.app>",
       to: [email],
       subject,
       html,
     });
+
+    console.log(`Email sent to ${email}: ${res.id}`);
   } catch (error) {
     console.error(error);
     throw error;

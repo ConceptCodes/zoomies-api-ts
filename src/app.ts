@@ -8,7 +8,6 @@ import morganBody from "morgan-body";
 import errorMiddleware from "@middleware/error";
 import notFoundMiddleware from "@middleware/notfound";
 import traceIdMiddleware from "@middleware/trace";
-import { authMiddleware } from "@middleware/auth";
 import { Routes } from "@/constants";
 import { env } from "@lib/env";
 import { connectToRedis } from "@lib/redis";
@@ -47,7 +46,6 @@ class App {
 
   private initializeMiddlewares(): void {
     this.app.use(traceIdMiddleware);
-    this.app.use(authMiddleware);
     this.app.use(express.json());
     this.app.use(cors());
     this.app.use(helmet());

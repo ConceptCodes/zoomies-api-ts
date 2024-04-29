@@ -3,8 +3,8 @@ import HealthRoute from "@route/health";
 import AuthRoute from "@route/auth";
 import PetRoute from "@route/pet";
 import ProfileRoute from "@route/profile";
-import ServiceRoute from "./routes/service";
-import AppointmentRoute from "./routes/appointment";
+import ServiceRoute from "@route/service";
+import AppointmentRoute from "@route/appointment";
 
 export const app = new App([
   new HealthRoute(),

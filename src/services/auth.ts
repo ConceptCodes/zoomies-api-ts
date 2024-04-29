@@ -5,7 +5,6 @@ import bcrypt from "bcryptjs";
 import {
   CreateEntityError,
   EmailVerificationError,
-  EntityNotFoundError,
   InvalidLoginCredentials,
   InvalidToken,
 } from "@/exceptions";
@@ -21,6 +20,7 @@ import { env } from "@lib/env";
 import { UserPayload } from "@/constants";
 import { generateOTPCode, verifyOTPCode } from "@/utils/auth";
 import { VerifyEmailData, WelcomeEmailData, sendEmail } from "@/lib/email";
+import { takeFirstOrThrow } from "@/utils";
 
 type Tokens = {
   token: string;
@@ -74,7 +74,7 @@ export default class AuthService {
       const isVerified = await verifyOTPCode(data);
       if (!isVerified) throw new InvalidToken();
 
-      const user = await db
+      const users = await db
         .update(userTable)
         .set({ emailVerified: new Date() })
         .where(eq(userTable.email, data.email))
@@ -82,8 +82,10 @@ export default class AuthService {
           name: userTable.fullName,
         });
 
+      const user = takeFirstOrThrow(users);
+
       const payload: WelcomeEmailData = {
-        name: user[0].name,
+        name: user.name,
       };
 
       await sendEmail(data.email, "welcome", payload);
@@ -97,20 +99,20 @@ export default class AuthService {
       const { email, password, fullName, phoneNumber } = data;
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      await db.insert(userTable).values({
-        email,
-        password: hashedPassword,
-        fullName,
-        phoneNumber,
-      });
-
       const code = await generateOTPCode(email);
 
       const payload: VerifyEmailData = {
         code,
       };
 
-      await sendEmail(email, "verify-email", payload);
+      await sendEmail(email, "verifyEmail", payload);
+
+      await db.insert(userTable).values({
+        email,
+        password: hashedPassword,
+        fullName,
+        phoneNumber,
+      });
     } catch (err) {
       console.error(err);
       throw new CreateEntityError();
@@ -127,17 +129,17 @@ export default class AuthService {
 
   public async refresh(userId: User["id"]): Promise<Tokens> {
     try {
-      const user = await db
+      const users = await db
         .select()
         .from(userTable)
         .where(eq(userTable.id, userId))
         .limit(1);
 
-      if (!user[0]) throw new EntityNotFoundError("REFRESH_TOKEN");
+      const user = takeFirstOrThrow(users);
 
       const { token, refreshToken } = this.generateToken({
-        id: user[0].id,
-        role: user[0].role,
+        id: user.id,
+        role: user.role,
       });
 
       await db.update(sessionTable).set({
