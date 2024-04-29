@@ -1,12 +1,12 @@
 version: "3"
 services:
   app:
-    container_name: zoomies
+    container_name: zoomies-api
     restart: always
     build:
       context: .
       dockerfile: dockerfile.dev
-    env_file: local.env
+    env_file: .env
     ports:
       - "80:8000"
     volumes:
@@ -18,7 +18,7 @@ services:
     image: postgres
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: example
-      POSTGRES_DB: mydatabase
+      POSTGRES_PASSWORD: postfes
+      POSTGRES_DB: postgres
     ports:
       - "5432:5432"

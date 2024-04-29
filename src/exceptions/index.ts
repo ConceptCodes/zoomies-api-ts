@@ -1,5 +1,4 @@
 import { ErrorCodes } from "@/constants";
-import { Optional } from "global";
 import { StatusCodes } from "http-status-codes";
 
 export class HttpException extends Error {
@@ -24,6 +23,12 @@ export class InvalidLoginCredentials extends HttpException {
   }
 }
 
+export class EmailVerificationError extends HttpException {
+  constructor() {
+    super(StatusCodes.BAD_REQUEST, "Email not verified", "AUTH_ERROR");
+  }
+}
+
 export class InvalidToken extends HttpException {
   constructor() {
     super(StatusCodes.UNAUTHORIZED, "Invalid token", "AUTH_ERROR");
@@ -43,7 +48,7 @@ export class InvalidRole extends HttpException {
 }
 
 export class ValidationError extends HttpException {
-  constructor(message: Optional<string>) {
+  constructor(message?: string) {
     super(StatusCodes.BAD_REQUEST, message || "Validation error");
   }
 }
@@ -59,19 +64,19 @@ export class InternalError extends HttpException {
 }
 
 export class CreateEntityError extends HttpException {
-  constructor(message: Optional<string>) {
+  constructor(message?: string) {
     super(StatusCodes.INTERNAL_SERVER_ERROR, message || "Create entity error");
   }
 }
 
 export class GetAllEntitiesError extends HttpException {
-  constructor(message: Optional<string>) {
+  constructor(message?: string) {
     super(StatusCodes.INTERNAL_SERVER_ERROR, message || "Get all entity error");
   }
 }
 
 export class GetEntityByIdError extends HttpException {
-  constructor(message: Optional<string>) {
+  constructor(message?: string) {
     super(
       StatusCodes.INTERNAL_SERVER_ERROR,
       message || "Get entity by id error"
@@ -80,19 +85,19 @@ export class GetEntityByIdError extends HttpException {
 }
 
 export class UpdateEntityError extends HttpException {
-  constructor(message: Optional<string>) {
+  constructor(message?: string) {
     super(StatusCodes.INTERNAL_SERVER_ERROR, message || "Update entity error");
   }
 }
 
 export class DeleteEntityError extends HttpException {
-  constructor(message: Optional<string>) {
+  constructor(message?: string) {
     super(StatusCodes.INTERNAL_SERVER_ERROR, message || "Delete entity error");
   }
 }
 
 export class EntityNotFoundError extends HttpException {
-  constructor(message: Optional<string>) {
+  constructor(message?: string) {
     super(StatusCodes.NOT_FOUND, message || "Entity not found", "NOT_FOUND");
   }
 }

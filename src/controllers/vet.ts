@@ -31,12 +31,10 @@ export default class VetController {
 
   public async updateVetInfo(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = Number(req.params.id);
-      const vet = await this.service.update(id, req.body);
+      const vet = await this.service.update(req.body);
       res.status(StatusCodes.OK).json(vet);
     } catch (error) {
       next(error);
     }
   }
-  
 }

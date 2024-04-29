@@ -7,6 +7,16 @@ const resend = new Resend(env.RESEND_API_KEY);
 
 type Data = Record<string, string>;
 
+export type VerifyEmailData = {
+  code: string;
+};
+
+export type WelcomeEmailData = {
+  name: string;
+};
+
+export type ResetPasswordEmailData = VerifyEmailData;
+
 type EmailTemplates = {
   [key: string]: {
     subject: string;
@@ -27,17 +37,23 @@ const loadTemplate = (name: string, args: Record<string, string>): string => {
 
 const templates: EmailTemplates = {
   welcome: {
-    subject: "Welcome to Acme",
+    subject: "Welcome to Zoomies",
     component: (data) => {
       return loadTemplate("welcome", data);
     },
   },
-  resetPassword: {
-    subject: "Reset your password",
+  verifyEmail: {
+    subject: "Verify your email",
     component: (data) => {
-      return loadTemplate("reset-password", data);
+      return loadTemplate("verify-email", data);
     },
   },
+  // resetPassword: {
+  //   subject: "Reset your password",
+  //   component: (data) => {
+  //     return loadTemplate("reset-password", data);
+  //   },
+  // },
 };
 
 export async function sendEmail<T extends keyof typeof templates>(
@@ -48,6 +64,12 @@ export async function sendEmail<T extends keyof typeof templates>(
   try {
     const subject = templates[template].subject;
     const html = templates[template].component(data);
+
+    // verify email is valid
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw new Error("Invalid email address");
+    }
 
     await resend.emails.send({
       from: "Zoomies <support@zoomies.dev>",

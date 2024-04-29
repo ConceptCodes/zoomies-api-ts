@@ -6,21 +6,22 @@
   "scripts": {
     "dev": "nodemon --config nodemon.json src/index.ts",
     "docker:dev": "docker-compose -f docker-compose.dev.yml up --build",
-    "start": "yarn build && node dist/index.js",
-    "build": "tsc -p . && npx tsc-alias",
+    "start": "bun run build && bun run dist/index.js",
+    "build": "tsc -p . && bun x tsc-alias",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
-    "test": "mocha -r ts-node/register -r tsconfig-paths/register src/**/*.spec.ts",
-    "coverage": "nyc -r lcov -e .ts -x \"*.spec.ts\" yarn test",
+    "test": "npx -r ts-node/register -r tsconfig-paths/register src/**/*.spec.ts",
+    "coverage": "nyc -r lcov -e .ts -x \"*.spec.ts\" bun run test",
     "prettier:fix": "prettier --write \"**/*.{js,ts}\"",
-    "db:studio": "npx drizzle studio",
+    "db:studio": "bun x drizzle studio",
     "db:generate": "npx drizzle-kit generate:pg",
-    "db:migrate": "npx ts-node src/lib/db/migrate"
+    "db:migrate": "bun run src/lib/db/migrate.ts"
   },
   "author": "conceptcodes@gmail.com",
   "license": "MIT",
   "dependencies": {
     "@t3-oss/env-core": "^0.6.1",
     "@types/bcryptjs": "^2.4.2",
+    "@upstash/redis": "^1.30.0",
     "axios": "^0.26.1",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",

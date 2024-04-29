@@ -1,7 +1,7 @@
 import { Router } from "express";
 import AuthController from "@controller/auth";
 import { Routes } from "@/constants";
-import { loginSchema, registerSchema } from "@/schemas";
+import { loginSchema, registerSchema, verifyEmailSchema } from "@/schemas";
 import ValidationMiddleware from "@middleware/validation";
 
 export default class AuthRoute implements Routes {
@@ -24,6 +24,11 @@ export default class AuthRoute implements Routes {
       `${this.path}/register`,
       ValidationMiddleware(registerSchema, "body"),
       this.controller.register
+    );
+    this.router.post(
+      `${this.path}/verify-email`,
+      ValidationMiddleware(verifyEmailSchema),
+      this.controller.verifyEmail
     );
   }
 }

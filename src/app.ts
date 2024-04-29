@@ -11,6 +11,7 @@ import traceIdMiddleware from "@middleware/trace";
 import { authMiddleware } from "@middleware/auth";
 import { Routes } from "@/constants";
 import { env } from "@lib/env";
+import { connectToRedis } from "@lib/redis";
 
 class App {
   public app: any;
@@ -26,6 +27,7 @@ class App {
     this.initializeRoutes(routes);
     this.initializeNotFoundHandling();
     this.initializeErrorHandling();
+    this.initializeRedis();
   }
 
   public listen(): void {
@@ -65,6 +67,10 @@ class App {
     routes.forEach((route) => {
       this.app.use("/api", route.router);
     });
+  }
+
+  private initializeRedis(): void {
+    void connectToRedis();
   }
 
   private initializeNotFoundHandling(): void {
