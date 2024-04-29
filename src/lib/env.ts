@@ -12,7 +12,11 @@ export const env = createEnv({
 
     DATABASE_URL: z.string().url(),
 
-    DEFAULT_APPOINTMENT_DURATION: z.coerce.number().int().positive(),
+    DEFAULT_APPOINTMENT_DURATION: z.coerce
+      .number()
+      .int()
+      .positive()
+      .default(30),
 
     JWT_SECRET: z.string().min(10),
     JWT_REFRESH_SECRET: z.string().min(10),
@@ -27,7 +31,7 @@ export const env = createEnv({
 
     REDIS_URL: z.string().url(),
     REDIS_TOKEN: z.string().min(1),
-    REDIS_EXPIRES_IN_MINS: z.coerce.number().int().positive(),
+    REDIS_EXPIRES_IN_MINS: z.coerce.number().int().positive().default(5),
   },
   runtimeEnv: process.env,
 });
