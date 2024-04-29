@@ -4,7 +4,10 @@ on:
   push:
     # this list of branches is often enough,
     # but you may still ignore other public branches
-    branches-ignore: [main dev development release]
+    branches-ignore: 
+      - main
+      - develop
+      - release
 
 jobs:
   opencommit:
