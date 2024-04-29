@@ -5,7 +5,7 @@ import { db } from "@lib/db";
 import { User, userTable } from "@lib/db/schema";
 import { UpdateSchema } from "@/schemas";
 
-type ReservedFields = "password" | "createdAt" | "updatedAt" | "refreshToken";
+type ReservedFields = "password" | "createdAt" | "updatedAt" | "refreshToken" | "emailVerified";
 
 export default class ProfileService {
   public async get(id: User["id"]): Promise<Omit<User, ReservedFields>> {

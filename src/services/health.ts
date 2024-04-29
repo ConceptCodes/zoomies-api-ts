@@ -1,6 +1,6 @@
 import { IHealthStatus } from "@/constants";
 import { checkDatabaseHealth } from "@/lib/db";
-import { checkEmailHealth } from "@/lib/mail";
+import { checkEmailHealth } from "@/lib/email";
 
 export default class HealthService {
   private healthReport: IHealthStatus[];

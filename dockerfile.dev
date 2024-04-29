@@ -1,9 +1,9 @@
-FROM node:16.5.0-alpine 
+FROM node:18-alpine
 WORKDIR /usr/src/app
-RUN apk add yarn
-RUN yarn global add nodemon
-COPY package.json nodemon.json yarn.lock ./
-RUN yarn install 
+RUN apk add bun
+RUN bun add --global nodemon
+COPY package.json nodemon.json bun.lockb ./
+RUN bun install 
 COPY ./ ./
 EXPOSE 8000
 CMD ["yarn","dev"]

@@ -34,7 +34,7 @@ export default class VetService {
 
   public async update(data: Required<UpdateVetSchema>): Promise<void> {
     try {
-      await db.update(vetTable).set(data).where(eq(vetTable.userId, data.id));
+      await db.update(vetTable).set(data).where(eq(vetTable.userId, data.userId));
     } catch (error) {
       throw error;
     }

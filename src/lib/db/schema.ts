@@ -7,7 +7,6 @@ import {
   integer,
   pgEnum,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 
 import { env } from "@lib/env";
@@ -20,6 +19,7 @@ export const userTable = pgTable("user", {
     .notNull()
     .default("USER"),
   email: varchar("email", { length: 256 }).notNull().unique(),
+  emailVerified: timestamp("email_verified"),
   password: varchar("password", { length: 256 }).notNull(),
   refreshToken: varchar("refresh_token", { length: 256 }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -30,33 +30,28 @@ export type User = typeof userTable.$inferSelect;
 export type NewUser = typeof userTable.$inferInsert;
 export const insertUserSchema = createInsertSchema(userTable);
 
-const PetType = [
-  "DOG",
-  "CAT",
-  "BIRD",
-  "HAMSTER",
-  "UNKNOWN",
-  "FISH",
-  "RABBIT",
-  "TURTLE",
-  "SNAKE",
-  "LIZARD",
-  "GUINEA_PIG",
-  "HORSE",
-  "GOAT",
-] as const;
-
-const PetTypeSchema = pgEnum("pet_type", PetType);
+const PetTypeSEnum = pgEnum("species", [
+  "dog",
+  "cat",
+  "bird",
+  "hamster",
+  "unknown",
+  "fish",
+  "rabbit",
+  "turtle",
+  "snake",
+  "lizard",
+  "guinea_pig",
+  "horse",
+  "goat",
+]);
 
 export const vetTable = pgTable("vet", {
   id: serial("id").notNull().primaryKey(),
   userId: integer("user_id")
     .notNull()
     .references(() => userTable.id),
-  allowedPetTypes: PetTypeSchema("type")
-    .array()
-    .notNull()
-    .default(sql`'{}'::pet_type[]`),
+  allowedPetTypes: PetTypeSEnum("type").array().notNull(),
   startHour: integer("start_hour").notNull().default(9),
   endHour: integer("end_hour").notNull().default(17),
   days: integer("days").notNull().default(5),
@@ -72,7 +67,7 @@ export const petTable = pgTable("pet", {
   id: serial("id").notNull().primaryKey(),
   name: text("name").notNull(),
   age: integer("age").notNull(),
-  type: PetTypeSchema("type").notNull().default("UNKNOWN"),
+  type: PetTypeSEnum("type").notNull().default("unknown"),
   ownerId: integer("owner_id")
     .notNull()
     .references(() => userTable.id),
@@ -88,9 +83,7 @@ export const serviceTable = pgTable("service", {
   id: serial("id").notNull().primaryKey(),
   name: text("name").notNull(),
   description: text("description"),
-  applicablePetType: text("applicable_pet_type", {
-    enum: PetType,
-  }).notNull(),
+  applicablePetTypes: PetTypeSEnum("applicable_pet_type").array().notNull(),
   price: integer("price").notNull().default(10),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),

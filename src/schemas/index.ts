@@ -79,7 +79,6 @@ export const getOneVetSchema = insertVetSchema.pick({
 });
 
 export const updateVetSchema = insertVetSchema.pick({
-  id: true,
   userId: true,
   startHour: true,
   endHour: true,
@@ -91,7 +90,6 @@ export const updateServiceSchema = insertServiceSchema.pick({
   id: true,
   name: true,
   description: true,
-  applicablePetType: true,
   price: true,
 });
 
@@ -113,10 +111,16 @@ export const getOneAppointmentSchema = insertAppointmentSchema.pick({
   id: true,
 });
 
+export const verifyEmailSchema = z.object({
+  email: z.string().email(),
+  code: z.string().length(6),
+});
+
 export type LoginSchema = z.infer<typeof loginSchema>;
 export type ForgotPasswordSchema = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
 export type RegisterSchema = z.infer<typeof registerSchema>;
+export type VerifyEmailSchema = z.infer<typeof verifyEmailSchema>;
 
 export type UpdateSchema = z.infer<typeof updateSchema>;
 
