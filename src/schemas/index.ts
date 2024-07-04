@@ -36,7 +36,7 @@ export const resetPasswordSchema = insertUserSchema.pick({
 });
 
 // Profile
-export const updateSchema = createInsertSchema(userTable, {
+export const updateProfileSchema = createInsertSchema(userTable, {
   id: (schema) => schema.id.positive(),
   fullName: (schema) => schema.fullName.max(255),
   // phoneNumber: (schema) => schema.phoneNumber.regex(/^\d{10}$/),
@@ -122,7 +122,7 @@ export type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
 export type RegisterSchema = z.infer<typeof registerSchema>;
 export type VerifyEmailSchema = z.infer<typeof verifyEmailSchema>;
 
-export type UpdateSchema = z.infer<typeof updateSchema>;
+export type UpdateProfileSchema = z.infer<typeof updateProfileSchema>;
 
 export type GetOnePetSchema = z.infer<typeof getOnePetSchema>;
 export type GetByTypePetSchema = z.infer<typeof getByTypePetSchema>;

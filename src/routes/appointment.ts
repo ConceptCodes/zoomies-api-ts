@@ -5,7 +5,7 @@ import { Routes } from "@/constants";
 import ValidationMiddleware from "@middleware/validation";
 import { getOneAppointmentSchema, updateAppointmentSchema } from "@/schemas";
 import { insertAppointmentSchema } from "@lib/db/schema";
-import { authMiddleware, isRole } from "@middleware/auth";
+import { authMiddleware, allowedRoles } from "@middleware/auth";
 
 export default class AppointmentRoute implements Routes {
   public path = "/appointment";
@@ -41,7 +41,7 @@ export default class AppointmentRoute implements Routes {
       `${this.path}/:id`,
       [
         authMiddleware,
-        isRole(["ADMIN"]),
+        allowedRoles(["ADMIN"]),
         ValidationMiddleware(getOneAppointmentSchema, "params"),
       ],
       this.controller.deleteAppointment

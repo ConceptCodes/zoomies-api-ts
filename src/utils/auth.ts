@@ -15,5 +15,6 @@ export const verifyOTPCode = async (
 ): Promise<boolean> => {
   const key = getOtpKey(data.email);
   const value = await get(key);
-  return value === data.code;
+  console.log(value, data.code)
+  return value == data.code;
 };

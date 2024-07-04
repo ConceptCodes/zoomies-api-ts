@@ -45,7 +45,7 @@ export default class AuthService {
 
       if (!tmp[0].emailVerified) {
         const code = await generateOTPCode(email);
-        await sendEmail(email, "verify-email", { code });
+        await sendEmail(email, "verifyEmail", { code });
         throw new EmailVerificationError();
       }
 

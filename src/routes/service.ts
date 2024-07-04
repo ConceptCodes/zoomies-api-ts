@@ -5,7 +5,7 @@ import { Routes } from "@/constants";
 import ValidationMiddleware from "@middleware/validation";
 import { insertServiceSchema } from "@lib/db/schema";
 import { getOneServiceSchema, updateServiceSchema } from "@/schemas";
-import { authMiddleware, isRole } from "@middleware/auth";
+import { authMiddleware, allowedRoles } from "@middleware/auth";
 
 export default class ServiceRoute implements Routes {
   public path = "/services";
@@ -28,7 +28,7 @@ export default class ServiceRoute implements Routes {
       [
         ValidationMiddleware(insertServiceSchema),
         authMiddleware,
-        isRole(["ADMIN"]),
+        allowedRoles(["ADMIN"]),
       ],
       this.controller.createService
     );
@@ -37,7 +37,7 @@ export default class ServiceRoute implements Routes {
       [
         ValidationMiddleware(updateServiceSchema),
         authMiddleware,
-        isRole(["ADMIN"]),
+        allowedRoles(["ADMIN"]),
       ],
       this.controller.updateService
     );
@@ -46,7 +46,7 @@ export default class ServiceRoute implements Routes {
       [
         ValidationMiddleware(getOneServiceSchema, "params"),
         authMiddleware,
-        isRole(["ADMIN"]),
+        allowedRoles(["ADMIN"]),
       ],
       this.controller.deleteService
     );

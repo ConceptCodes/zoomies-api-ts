@@ -1,8 +1,8 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
-import jwt_decode, { InvalidTokenError } from "jwt-decode";
+import jwt from "jsonwebtoken";
 
 import { UserPayload } from "@/constants";
-import { InvalidRole } from "@/exceptions";
+import { InvalidRole, InvalidToken } from "@/exceptions";
 import { User } from "@/lib/db/schema";
 
 const authMiddleware = async (
@@ -14,22 +14,22 @@ const authMiddleware = async (
     let payload = req.get("Authorization");
     if (payload && payload.startsWith("Bearer ")) {
       payload = payload.slice(7, payload.length);
-      const _token: UserPayload = jwt_decode(payload, {
-        header: true,
-      });
+      const _token: UserPayload = jwt.decode(payload) as UserPayload;
       if (_token && _token.id && _token.role) {
         req.user = { id: _token.id, role: _token.role };
+        next();
       } else {
-        throw new InvalidTokenError();
+        throw new InvalidToken();
       }
+    } else {
+      throw new InvalidToken();
     }
-    next();
   } catch (error) {
     next(error);
   }
 };
 
-const isRole = (role: User["role"][]): RequestHandler => {
+const allowedRoles = (role: User["role"][]): RequestHandler => {
   return async (req, _, next) => {
     if (role.includes(req.user?.role)) {
       next();
@@ -39,4 +39,4 @@ const isRole = (role: User["role"][]): RequestHandler => {
   };
 };
 
-export { authMiddleware, isRole };
+export { authMiddleware, allowedRoles };

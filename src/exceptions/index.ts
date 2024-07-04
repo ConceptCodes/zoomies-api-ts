@@ -98,6 +98,6 @@ export class DeleteEntityError extends HttpException {
 
 export class EntityNotFoundError extends HttpException {
   constructor(message?: string) {
-    super(StatusCodes.NOT_FOUND, message || "Entity not found", "NOT_FOUND");
+    super(StatusCodes.NOT_FOUND, `${message} not found` || "Entity not found", "NOT_FOUND");
   }
 }

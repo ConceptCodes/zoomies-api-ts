@@ -20,6 +20,7 @@ export const userTable = pgTable("user", {
     .default("USER"),
   email: varchar("email", { length: 256 }).notNull().unique(),
   emailVerified: timestamp("email_verified"),
+  phoneNumberVerified: timestamp("phone_number_verified"),
   password: varchar("password", { length: 256 }).notNull(),
   refreshToken: varchar("refresh_token", { length: 256 }),
   createdAt: timestamp("created_at").notNull().defaultNow(),

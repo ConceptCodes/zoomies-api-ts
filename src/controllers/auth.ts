@@ -26,7 +26,9 @@ export default class AuthController {
       });
 
       res.header("Authorization", `Bearer ${token}`);
-      res.status(StatusCodes.OK).send();
+      res.status(StatusCodes.OK).send({
+        message: "Login successful.",
+      });
     } catch (err) {
       next(err);
     }
@@ -46,7 +48,9 @@ export default class AuthController {
   public verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
     try {
       await this.service.verifyEmail(req.body);
-      res.status(StatusCodes.OK).send();
+      res.status(StatusCodes.OK).send({
+        message: "Email verified successfully.",
+      });
     } catch (err) {
       next(err);
     }

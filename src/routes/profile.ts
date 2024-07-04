@@ -3,7 +3,8 @@ import { Router } from "express";
 import ProfileController from "@controller/profile";
 import { Routes } from "@/constants";
 import ValidationMiddleware from "@middleware/validation";
-import { updateSchema } from "@/schemas";
+import { updateProfileSchema } from "@/schemas";
+import { authMiddleware } from "@/middlewares/auth";
 
 export default class ProfileRoute implements Routes {
   public path = "/profile";
@@ -15,10 +16,10 @@ export default class ProfileRoute implements Routes {
   }
 
   private initializeRoutes(): void {
-    this.router.get(`${this.path}/`, this.controller.getProfile);
+    this.router.get(this.path, authMiddleware, this.controller.getProfile);
     this.router.patch(
-      `${this.path}/`,
-      ValidationMiddleware(updateSchema),
+      this.path,
+      [authMiddleware, ValidationMiddleware(updateProfileSchema)],
       this.controller.updateProfile
     );
   }

@@ -3,9 +3,15 @@ import { eq } from "drizzle-orm";
 import { EntityNotFoundError } from "@/exceptions";
 import { db } from "@lib/db";
 import { User, userTable } from "@lib/db/schema";
-import { UpdateSchema } from "@/schemas";
+import { UpdateProfileSchema } from "@/schemas";
 
-type ReservedFields = "password" | "createdAt" | "updatedAt" | "refreshToken" | "emailVerified";
+type ReservedFields =
+  | "password"
+  | "createdAt"
+  | "updatedAt"
+  | "refreshToken"
+  | "phoneNumberVerified"
+  | "emailVerified";
 
 export default class ProfileService {
   public async get(id: User["id"]): Promise<Omit<User, ReservedFields>> {
@@ -30,7 +36,7 @@ export default class ProfileService {
     }
   }
 
-  public async update(data: Required<UpdateSchema>): Promise<void> {
+  public async update(data: Required<UpdateProfileSchema>): Promise<void> {
     try {
       const { fullName, id } = data;
 
