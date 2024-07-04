@@ -48,7 +48,10 @@ export default class PetController {
 
   public async createPet(req: Request, res: Response, next: NextFunction) {
     try {
-      await this.service.create(req.body);
+      await this.service.create({
+        ...req.body,
+        ownerId: req.user.id,
+      });
       res.status(StatusCodes.CREATED).json({
         message: "Pet created successfully",
       });

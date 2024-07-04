@@ -1,5 +1,9 @@
+import { eq } from "drizzle-orm";
+
 import { get, set } from "@/lib/redis";
 import { VerifyEmailSchema } from "@/schemas";
+import { User, userTable } from "@/lib/db/schema";
+import { db } from "@lib/db";
 
 const getOtpKey = (email: string) => `otp:${email}`;
 
@@ -15,6 +19,16 @@ export const verifyOTPCode = async (
 ): Promise<boolean> => {
   const key = getOtpKey(data.email);
   const value = await get(key);
-  console.log(value, data.code)
+  console.log(value, data.code);
   return value == data.code;
+};
+
+export const doesUserExist = async (id: User["id"]): Promise<boolean> => {
+  const tmp = await db
+    .select()
+    .from(userTable)
+    .where(eq(userTable.id, id))
+    .limit(1);
+
+  return !!tmp[0];
 };

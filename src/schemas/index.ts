@@ -46,6 +46,13 @@ export const updateProfileSchema = createInsertSchema(userTable, {
   // phoneNumber: true,
 });
 
+export const addPetSchema = insertPetSchema.pick({
+  ownerId: true,
+  name: true,
+  type: true,
+  age: true,
+});
+
 // Pet
 export const getOnePetSchema = insertPetSchema
   .pick({
@@ -126,7 +133,7 @@ export type UpdateProfileSchema = z.infer<typeof updateProfileSchema>;
 
 export type GetOnePetSchema = z.infer<typeof getOnePetSchema>;
 export type GetByTypePetSchema = z.infer<typeof getByTypePetSchema>;
-export type CreatePetSchema = z.infer<typeof insertPetSchema>;
+export type CreatePetSchema = z.infer<typeof addPetSchema>;
 export type UpdatePetSchema = z.infer<typeof updatePetSchema>;
 
 export type UpdateVetSchema = z.infer<typeof updateVetSchema>;

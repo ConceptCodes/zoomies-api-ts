@@ -4,6 +4,7 @@ import { EntityNotFoundError } from "@/exceptions";
 import { db } from "@lib/db";
 import { User, userTable } from "@lib/db/schema";
 import { UpdateProfileSchema } from "@/schemas";
+import { doesUserExist } from "@/utils/auth";
 
 type ReservedFields =
   | "password"
@@ -40,20 +41,10 @@ export default class ProfileService {
     try {
       const { fullName, id } = data;
 
-      const tmp = await db
-        .select()
-        .from(userTable)
-        .where(eq(userTable.id, id))
-        .limit(1);
+      const exist = await doesUserExist(id);
+      if (!exist) throw new EntityNotFoundError("USER");
 
-      if (!tmp[0]) throw new EntityNotFoundError("USER");
-
-      await db
-        .update(userTable)
-        .set({
-          fullName,
-        })
-        .where(eq(userTable.id, id));
+      await db.update(userTable).set({ fullName }).where(eq(userTable.id, id));
     } catch (err) {
       throw err;
     }

@@ -8,6 +8,8 @@ import type {
   GetOnePetSchema,
   UpdatePetSchema,
 } from "@/schemas";
+import { doesUserExist } from "@/utils/auth";
+import { EntityNotFoundError } from "@/exceptions";
 
 export default class PetService {
   public async getAll(userId: User["id"]): Promise<Pet[]> {
@@ -51,6 +53,9 @@ export default class PetService {
 
   public async create(data: CreatePetSchema): Promise<void> {
     try {
+      const exist = await doesUserExist(data.ownerId);
+      if (!exist) throw new EntityNotFoundError("USER");
+
       await db.insert(petTable).values(data);
     } catch (error) {
       throw error;

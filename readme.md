@@ -111,7 +111,7 @@ To get this API up and running, follow these steps:
    - Fill in the required configuration values.
 
    ```sh
-   touch .env && cp .env.example .env
+   cp .env.example .env
    ```
 
 5. Run DB Migration:
