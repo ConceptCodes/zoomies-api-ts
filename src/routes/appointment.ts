@@ -26,6 +26,11 @@ export default class AppointmentRoute implements Routes {
       this.controller.getAllAppointments
     );
     this.router.get(
+      `${this.path}/mine`,
+      authMiddleware,
+      this.controller.getUserAppointments
+    );
+    this.router.get(
       `${this.path}/:id`,
       [authMiddleware, ValidationMiddleware(getOneAppointmentSchema, "params")],
       this.controller.getOneAppointment

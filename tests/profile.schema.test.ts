@@ -1,3 +1,5 @@
+import "./setup-env";
+
 import { describe, expect, test } from "bun:test";
 
 import {

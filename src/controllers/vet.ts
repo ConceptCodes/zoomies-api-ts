@@ -8,8 +8,8 @@ import type { CreateVetSchema, UpdateVetSchema } from "@/schemas";
 export default class VetController {
   private service: VetService;
 
-  constructor() {
-    this.service = new VetService();
+  constructor(service: VetService = new VetService()) {
+    this.service = service;
   }
 
   public async getAllVets(_: Request, res: Response, next: NextFunction) {
@@ -44,9 +44,10 @@ export default class VetController {
   public async updateVetInfo(req: Request, res: Response, next: NextFunction) {
     try {
       const targetUserId = req.params.id;
+      const isAdmin = req.user.role === "ADMIN";
       const isSelf = req.user.id === targetUserId;
 
-      if (!isSelf) {
+      if (!isAdmin && !isSelf) {
         throw new InvalidRole();
       }
 

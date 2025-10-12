@@ -1,23 +1,35 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
-import { EntityNotFoundError } from "@/exceptions";
+import {
+  EntityNotFoundError,
+  InvalidRole,
+} from "@/exceptions";
 import { db } from "@lib/db";
-import { Appointment, appointmentTable } from "@lib/db/schema";
-import { CreateAppointmentSchema, UpdateAppointmentSchema } from "@/schemas";
+import {
+  Appointment,
+  Pet,
+  Service,
+  User,
+  Vet,
+  appointmentTable,
+  petTable,
+  serviceTable,
+  vetTable,
+} from "@lib/db/schema";
+import {
+  CreateAppointmentSchema,
+  UpdateAppointmentSchema,
+} from "@/schemas";
 import { getNotificationPublisher } from "@service/notification";
+import { takeFirst } from "@/utils";
+import { UserPayload } from "@/constants";
 
 export default class AppointmentService {
-  public async get(id: Appointment["id"]) {
+  public async get(id: Appointment["id"], requester: UserPayload) {
     try {
-      const tmp = await db
-        .select()
-        .from(appointmentTable)
-        .where(eq(appointmentTable.id, id))
-        .limit(1);
-
-      if (!tmp[0]) throw new EntityNotFoundError("Appointment Not Found");
-
-      return tmp[0];
+      const appointment = await this.findByIdOrThrow(id);
+      this.assertAccess(appointment, requester);
+      return appointment;
     } catch (err) {
       throw err;
     }
@@ -25,8 +37,7 @@ export default class AppointmentService {
 
   public async getAll(): Promise<Appointment[]> {
     try {
-      const tmp = await db.select().from(appointmentTable);
-      return tmp;
+      return await db.select().from(appointmentTable);
     } catch (err) {
       throw err;
     }
@@ -34,12 +45,10 @@ export default class AppointmentService {
 
   public async getAllByUserId(userId: Appointment["userId"]) {
     try {
-      const tmp = await db
+      return await db
         .select()
         .from(appointmentTable)
         .where(eq(appointmentTable.userId, userId));
-
-      return tmp;
     } catch (err) {
       throw err;
     }
@@ -50,6 +59,10 @@ export default class AppointmentService {
     data: CreateAppointmentSchema
   ): Promise<Appointment> {
     try {
+      await this.assertPetOwnership(data.petId, userId);
+      await this.assertServiceExists(data.serviceId);
+      await this.assertVetExists(data.vetId);
+
       const appointmentPayload = { ...data, userId };
 
       const inserted = await db
@@ -57,31 +70,12 @@ export default class AppointmentService {
         .values(appointmentPayload)
         .returning();
 
-      const appointment = inserted[0];
-
+      const appointment = takeFirst(inserted);
       if (!appointment) {
-        throw new EntityNotFoundError("Appointment Creation Failed");
+        throw new EntityNotFoundError("APPOINTMENT");
       }
 
-      try {
-        const publisher = getNotificationPublisher();
-        await publisher.scheduleAppointmentReminder(
-          {
-            appointmentId: appointment.id,
-            appointmentDate: appointment.date.toISOString(),
-            userId: appointment.userId,
-            vetId: appointment.vetId,
-            serviceId: appointment.serviceId,
-            petId: appointment.petId,
-          },
-          new Date(appointment.date)
-        );
-      } catch (error) {
-        console.error("Failed to schedule appointment reminder", {
-          appointmentId: appointment.id,
-          error,
-        });
-      }
+      await this.scheduleReminder(appointment);
 
       return appointment;
     } catch (err) {
@@ -90,16 +84,35 @@ export default class AppointmentService {
   }
 
   public async update(
-    data: Required<UpdateAppointmentSchema>
+    requester: UserPayload,
+    data: UpdateAppointmentSchema
   ): Promise<Appointment> {
     try {
+      const existing = await this.findByIdOrThrow(data.id);
+      this.assertAccess(existing, requester);
+
+      await this.assertPetOwnership(data.petId, existing.userId);
+      await this.assertServiceExists(data.serviceId);
+
+      const updates = {
+        ...data,
+        updatedAt: new Date(),
+      };
+
       const result = await db
         .update(appointmentTable)
-        .set(data)
+        .set(updates)
         .where(eq(appointmentTable.id, data.id))
         .returning();
 
-      return result[0];
+      const appointment = takeFirst(result);
+      if (!appointment) {
+        throw new EntityNotFoundError("APPOINTMENT");
+      }
+
+      await this.scheduleReminder(appointment);
+
+      return appointment;
     } catch (err) {
       throw err;
     }
@@ -110,6 +123,91 @@ export default class AppointmentService {
       await db.delete(appointmentTable).where(eq(appointmentTable.id, id));
     } catch (err) {
       throw err;
+    }
+  }
+
+  private assertAccess(
+    appointment: Appointment,
+    requester: UserPayload
+  ): void {
+    if (requester.role === "ADMIN") return;
+    if (appointment.userId !== requester.id) {
+      throw new InvalidRole();
+    }
+  }
+
+  private async findByIdOrThrow(id: Appointment["id"]): Promise<Appointment> {
+    const results = await db
+      .select()
+      .from(appointmentTable)
+      .where(eq(appointmentTable.id, id))
+      .limit(1);
+
+    const appointment = takeFirst(results);
+    if (!appointment) {
+      throw new EntityNotFoundError("APPOINTMENT");
+    }
+    return appointment;
+  }
+
+  private async assertPetOwnership(
+    petId: Pet["id"],
+    ownerId: User["id"]
+  ): Promise<void> {
+    const pets = await db
+      .select({ id: petTable.id })
+      .from(petTable)
+      .where(and(eq(petTable.id, petId), eq(petTable.ownerId, ownerId)))
+      .limit(1);
+
+    if (!takeFirst(pets)) {
+      throw new EntityNotFoundError("PET");
+    }
+  }
+
+  private async assertServiceExists(serviceId: Service["id"]): Promise<void> {
+    const services = await db
+      .select({ id: serviceTable.id })
+      .from(serviceTable)
+      .where(eq(serviceTable.id, serviceId))
+      .limit(1);
+
+    if (!takeFirst(services)) {
+      throw new EntityNotFoundError("SERVICE");
+    }
+  }
+
+  private async assertVetExists(vetUserId: Vet["userId"]): Promise<void> {
+    const vets = await db
+      .select({ id: vetTable.id })
+      .from(vetTable)
+      .where(eq(vetTable.userId, vetUserId))
+      .limit(1);
+
+    if (!takeFirst(vets)) {
+      throw new EntityNotFoundError("VET");
+    }
+  }
+
+  private async scheduleReminder(appointment: Appointment): Promise<void> {
+    try {
+      const publisher = getNotificationPublisher();
+      await publisher.scheduleAppointmentReminder(
+        {
+          appointmentId: appointment.id,
+          appointmentDate: appointment.date.toISOString(),
+          userId: appointment.userId,
+          vetId: appointment.vetId,
+          serviceId: appointment.serviceId,
+          petId: appointment.petId,
+        },
+        new Date(appointment.date)
+      );
+    } catch (error) {
+      console.error("Failed to schedule appointment reminder", {
+        appointmentId: appointment.id,
+        error,
+      });
     }
   }
 }

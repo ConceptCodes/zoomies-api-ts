@@ -13,7 +13,16 @@ export class NotificationConsumer {
       const job = message.payload;
       job.id = job.id ?? message.id;
       try {
+        console.info("Processing notification job", {
+          jobId: job.id,
+          type: job.type,
+          sendAt: job.sendAt?.toISOString?.(),
+        });
         await this.sender.handle(job);
+        console.info("Notification job completed", {
+          jobId: job.id,
+          type: job.type,
+        });
       } catch (error) {
         console.error("Failed to process notification job", {
           jobId: job.id,

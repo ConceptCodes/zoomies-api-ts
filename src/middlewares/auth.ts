@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { UserPayload } from "@/constants";
 import { InvalidRole, InvalidToken } from "@/exceptions";
 import { User } from "@/lib/db/schema";
+import { env } from "@/lib/env";
 
 const authMiddleware = async (
   req: Request,
@@ -14,7 +15,10 @@ const authMiddleware = async (
     let payload = req.get("Authorization");
     if (payload && payload.startsWith("Bearer ")) {
       payload = payload.slice(7, payload.length);
-      const _token: UserPayload = jwt.decode(payload) as UserPayload;
+      const _token: UserPayload = jwt.verify(
+        payload,
+        env.JWT_SECRET
+      ) as UserPayload;
       if (_token && _token.id && _token.role) {
         req.user = { id: _token.id, role: _token.role };
         next();

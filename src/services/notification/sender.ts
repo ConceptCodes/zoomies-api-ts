@@ -179,6 +179,11 @@ export class NotificationSender {
         console.warn(`Adapter for channel ${channel} not configured`);
         continue;
       }
+      console.info("Sending notification", {
+        jobId: job.id,
+        channel,
+        type: job.type,
+      });
       await adapter.sendAppointmentReminder(context);
     }
   }

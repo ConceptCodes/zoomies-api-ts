@@ -5,9 +5,36 @@ import type {
   NotificationJob,
 } from "@lib/notifications/types";
 import { NotificationEventType } from "@lib/notifications/types";
+import { getRedisClient } from "@lib/redis";
+
+export interface NotificationIdempotencyStore {
+  claim(key: string, ttlMs: number): Promise<boolean>;
+}
+
+class RedisNotificationIdempotencyStore
+  implements NotificationIdempotencyStore
+{
+  public async claim(key: string, ttlMs: number): Promise<boolean> {
+    try {
+      const redis = getRedisClient();
+      const ttlSeconds = Math.max(1, Math.ceil(ttlMs / 1000));
+      const result = await redis.set(key, "1", {
+        nx: true,
+        ex: ttlSeconds,
+      });
+      return result === "OK";
+    } catch (error) {
+      console.warn("Notification idempotency store not available", error);
+      return true; // best effort when redis is unavailable
+    }
+  }
+}
 
 export class NotificationPublisher {
-  constructor(private readonly queue: MessageQueue<NotificationJob>) {}
+  constructor(
+    private readonly queue: MessageQueue<NotificationJob>,
+    private readonly idempotencyStore: NotificationIdempotencyStore = new RedisNotificationIdempotencyStore()
+  ) {}
 
   public async publish(job: NotificationJob): Promise<void> {
     await this.queue.publish({
@@ -25,6 +52,17 @@ export class NotificationPublisher {
     const target = new Date(appointmentDate.getTime() - leadTimeMs);
 
     const sendAt = target.getTime() > Date.now() ? target : new Date();
+
+    const key = `notifications:appointment:${payload.appointmentId}:${payload.appointmentDate}`;
+    const ttlMs = Math.max(
+      leadTimeMs,
+      appointmentDate.getTime() - Date.now() + leadTimeMs
+    );
+
+    const shouldPublish = await this.idempotencyStore.claim(key, ttlMs);
+    if (!shouldPublish) {
+      return;
+    }
 
     const job: NotificationJob = {
       type: NotificationEventType.APPOINTMENT_REMINDER,

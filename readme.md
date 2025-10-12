@@ -732,9 +732,35 @@ curl http://localhost:8000/api/appointment \
 ]
 ```
 
+#### `GET /api/appointment/mine`
+- **Auth**: Required
+- **Description**: Return every appointment belonging to the authenticated user.
+- **Sample request**
+```bash
+curl http://localhost:8000/api/appointment/mine \
+  -H "Authorization: Bearer <jwt>"
+```
+- **Sample response**
+```json
+[
+  {
+    "id": "3a7d2e5b-9f48-4d2d-a0c8-df5c7ba4e123",
+    "petId": "1b0d6a54-2c46-4efa-90b8-4c064fd2e1a3",
+    "vetId": "2c4d9f86-1a2b-4ce7-8d9f-7ad6245f9c30",
+    "serviceId": "0c9f1e73-7b52-4c3f-9a3d-26a4cd6b9e12",
+    "userId": "6f8d0c8a-3fcf-4c83-8a41-16d3e6b1f5c2",
+    "date": "2024-07-12T14:00:00.000Z",
+    "description": "Follow-up consultation",
+    "duration": 45,
+    "createdAt": "2024-06-20T15:10:00.000Z",
+    "updatedAt": "2024-06-20T15:10:00.000Z"
+  }
+]
+```
+
 #### `GET /api/appointment/:id`
 - **Auth**: Required
-- **Description**: Retrieve a single appointment by ID.
+- **Description**: Retrieve a single appointment by ID. Access is limited to the booking user or an admin.
 - **Sample request**
 ```bash
 curl http://localhost:8000/api/appointment/3a7d2e5b-9f48-4d2d-a0c8-df5c7ba4e123 \
@@ -755,6 +781,7 @@ curl http://localhost:8000/api/appointment/3a7d2e5b-9f48-4d2d-a0c8-df5c7ba4e123 
   "updatedAt": "2024-06-20T15:10:00.000Z"
 }
 ```
+- Returns `404 Not Found` if the appointment does not exist or is not accessible to the requester.
 
 #### `POST /api/appointment`
 - **Auth**: Required
@@ -788,11 +815,11 @@ curl -X POST http://localhost:8000/api/appointment \
   "updatedAt": "2024-06-25T08:00:00.000Z"
 }
 ```
-- The authenticated user's ID is injected server-side. A reminder job is queued using the `APPOINTMENT_REMINDER_LEAD_MINUTES` offset before the appointment time and will dispatch via every channel enabled in the user's notification preferences (email is always available; SMS depends on Twilio configuration).
+- The authenticated user's ID is injected server-side. A reminder job is queued using the `APPOINTMENT_REMINDER_LEAD_MINUTES` offset before the appointment time and will dispatch via every channel enabled in the user's notification preferences (email is always available; SMS depends on Twilio configuration). Pets, services, and vets are validated before the appointment is created.
 
 #### `PATCH /api/appointment`
 - **Auth**: Required
-- **Description**: Update an appointment's details (currently limited to `petId`, `serviceId`, and `date`).
+- **Description**: Update an appointment's details (currently limited to `petId`, `serviceId`, and `date`). Only the booking user or an admin may perform this action.
 - **Sample request**
 ```bash
 curl -X PATCH http://localhost:8000/api/appointment \
@@ -820,6 +847,7 @@ curl -X PATCH http://localhost:8000/api/appointment \
   "updatedAt": "2024-06-26T10:00:00.000Z"
 }
 ```
+- Responds with `404 Not Found` when the appointment cannot be located for the authenticated user.
 
 #### `DELETE /api/appointment/:id`
 - **Auth**: Required (admin only)

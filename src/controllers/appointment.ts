@@ -2,7 +2,10 @@ import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 
 import AppointmentService from "@service/appointment";
-import type { CreateAppointmentSchema } from "@/schemas";
+import type {
+  CreateAppointmentSchema,
+  UpdateAppointmentSchema,
+} from "@/schemas";
 
 export default class AppointmentController {
   private service: AppointmentService;
@@ -17,7 +20,7 @@ export default class AppointmentController {
     next: NextFunction
   ) => {
     try {
-      const data = await this.service.get(req.params.id);
+      const data = await this.service.get(req.params.id, req.user);
       res.status(StatusCodes.OK).json(data);
     } catch (err) {
       next(err);
@@ -70,7 +73,8 @@ export default class AppointmentController {
     next: NextFunction
   ) => {
     try {
-      const data = await this.service.update(req.body);
+      const payload = req.body as UpdateAppointmentSchema;
+      const data = await this.service.update(req.user, payload);
       res.status(StatusCodes.OK).json(data);
     } catch (err) {
       next(err);
