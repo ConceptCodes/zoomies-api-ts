@@ -29,3 +29,11 @@ export const get = async (key: string) => {
     throw err;
   }
 };
+
+export function getRedisClient(): Redis {
+  if (!redis) {
+    throw new Error("Redis client not initialized. Call connectToRedis first.");
+  }
+
+  return redis;
+}

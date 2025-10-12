@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 
 import AppointmentService from "@service/appointment";
+import type { CreateAppointmentSchema } from "@/schemas";
 
 export default class AppointmentController {
   private service: AppointmentService;
@@ -16,7 +17,7 @@ export default class AppointmentController {
     next: NextFunction
   ) => {
     try {
-      const data = await this.service.get(Number(req.params.id));
+      const data = await this.service.get(req.params.id);
       res.status(StatusCodes.OK).json(data);
     } catch (err) {
       next(err);
@@ -55,7 +56,8 @@ export default class AppointmentController {
     next: NextFunction
   ) => {
     try {
-      const data = await this.service.create(req.body);
+      const payload = req.body as CreateAppointmentSchema;
+      const data = await this.service.create(req.user.id, payload);
       res.status(StatusCodes.CREATED).json(data);
     } catch (err) {
       next(err);
@@ -81,7 +83,7 @@ export default class AppointmentController {
     next: NextFunction
   ) => {
     try {
-      await this.service.delete(Number(req.params.id));
+      await this.service.delete(req.params.id);
       res.status(StatusCodes.OK).json({
         message: "Appointment deleted successfully",
       });

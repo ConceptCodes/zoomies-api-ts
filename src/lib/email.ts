@@ -18,6 +18,14 @@ export type WelcomeEmailData = {
 
 export type ResetPasswordEmailData = VerifyEmailData;
 
+export type AppointmentReminderEmailData = {
+  name: string;
+  appointmentDate: string;
+  serviceName: string;
+  petName?: string;
+  vetName?: string;
+};
+
 type Email = {
   [key: string]: {
     subject: string;
@@ -47,6 +55,12 @@ const templates: Email = {
     subject: "Verify your email",
     component: (data) => {
       return loadTemplate("verify-email", data);
+    },
+  },
+  appointmentReminder: {
+    subject: "Your appointment is coming up",
+    component: (data) => {
+      return loadTemplate("appointment-reminder", data);
     },
   },
   // resetPassword: {

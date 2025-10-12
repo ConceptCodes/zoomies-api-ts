@@ -1,24 +1,28 @@
-# Stage=Build
-FROM node:16.5.0-alpine AS builder
-RUN apk update && apk --no-cache add python make g++
-WORKDIR /usr/src/app
-COPY package.json yarn.lock ./
-COPY ./ ./
-RUN ls -a
-RUN yarn install 
-RUN yarn build 
+# syntax=docker/dockerfile:1
 
-# Stage=Execute
-FROM node:16.5.0-alpine 
-WORKDIR /usr/src/app
-RUN apk add yarn
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile --production
-COPY --from=builder /usr/src/app/dist ./
+FROM oven/bun:1.1 AS builder
+WORKDIR /app
+
+# Install dependencies (cached)
+COPY bun.lockb package.json ./
+RUN bun install --frozen-lockfile
+
+# Build application
+COPY . .
+RUN bun run build \
+ && if [ -d src/emails ]; then mkdir -p dist && cp -R src/emails dist/emails; fi
+
+
+FROM oven/bun:1.1 AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+# Install production dependencies
+COPY --from=builder /app/package.json /app/bun.lockb ./
+RUN bun install --frozen-lockfile --production
+
+# Copy compiled application
+COPY --from=builder /app/dist ./dist
+
 EXPOSE 8000
-CMD ["node", "index.js"]
-
-
-
-
-
+CMD ["bun", "run", "dist/index.js"]

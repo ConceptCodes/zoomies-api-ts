@@ -11,6 +11,7 @@ import traceIdMiddleware from "@middleware/trace";
 import { Routes } from "@/constants";
 import { env } from "@lib/env";
 import { connectToRedis } from "@lib/redis";
+import { initializeNotificationModule } from "@service/notification";
 
 class App {
   public app: any;
@@ -68,7 +69,14 @@ class App {
   }
 
   private initializeRedis(): void {
-    void connectToRedis();
+    void (async () => {
+      try {
+        await connectToRedis();
+        initializeNotificationModule();
+      } catch (error) {
+        console.error("Failed to initialize Redis or notifications", error);
+      }
+    })();
   }
 
   private initializeNotFoundHandling(): void {

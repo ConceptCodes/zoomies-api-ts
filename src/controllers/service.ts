@@ -29,7 +29,7 @@ export default class ServiceController {
     next: NextFunction
   ) => {
     try {
-      const data = await this.service.getOneById(Number(req.params.id));
+      const data = await this.service.getOneById(req.params.id);
       res.status(StatusCodes.OK).json(data);
     } catch (err) {
       next(err);
@@ -68,7 +68,7 @@ export default class ServiceController {
     next: NextFunction
   ) => {
     try {
-      await this.service.delete(Number(req.params.id));
+      await this.service.delete(req.params.id);
       res.status(StatusCodes.NO_CONTENT).json();
     } catch (err) {
       next(err);

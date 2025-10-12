@@ -1,18 +1,21 @@
+import { sql } from "drizzle-orm";
 import {
   pgTable,
-  serial,
   text,
   varchar,
   timestamp,
   integer,
   pgEnum,
+  uuid,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 
 import { env } from "@lib/env";
+import type { NotificationPreferences } from "@lib/notifications/types";
 
 export const userTable = pgTable("user", {
-  id: serial("id").notNull().primaryKey(),
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
   fullName: text("full_name").notNull(),
   phoneNumber: varchar("phone_number", { length: 10 }).notNull(),
   role: text("role", { enum: ["ADMIN", "USER"] })
@@ -25,6 +28,12 @@ export const userTable = pgTable("user", {
   refreshToken: varchar("refresh_token", { length: 256 }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  notificationPreferences: jsonb("notification_preferences")
+    .$type<NotificationPreferences>()
+    .notNull()
+    .default(
+      sql`'{"channels":["EMAIL"],"upcomingAppointments":{"enabled":true}}'::jsonb`
+    ),
 });
 
 export type User = typeof userTable.$inferSelect;
@@ -51,8 +60,8 @@ export type Species = (typeof species)[number];
 export const PetTypeSEnum = pgEnum("species", species);
 
 export const vetTable = pgTable("vet", {
-  id: serial("id").notNull().primaryKey(),
-  userId: integer("user_id")
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
+  userId: uuid("user_id")
     .notNull()
     .references(() => userTable.id),
   allowedPetTypes: PetTypeSEnum("type").array().notNull(),
@@ -68,11 +77,11 @@ export type NewVet = typeof vetTable.$inferInsert;
 export const insertVetSchema = createInsertSchema(vetTable);
 
 export const petTable = pgTable("pet", {
-  id: serial("id").notNull().primaryKey(),
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
   name: text("name").notNull(),
   age: integer("age").notNull(),
   type: PetTypeSEnum("type").notNull().default("unknown"),
-  ownerId: integer("owner_id")
+  ownerId: uuid("owner_id")
     .notNull()
     .references(() => userTable.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -84,7 +93,7 @@ export type NewPet = typeof petTable.$inferInsert;
 export const insertPetSchema = createInsertSchema(petTable);
 
 export const serviceTable = pgTable("service", {
-  id: serial("id").notNull().primaryKey(),
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
   name: text("name").notNull(),
   description: text("description"),
   applicablePetTypes: PetTypeSEnum("applicable_pet_type").array().notNull(),
@@ -98,17 +107,17 @@ export type NewService = typeof serviceTable.$inferInsert;
 export const insertServiceSchema = createInsertSchema(serviceTable);
 
 export const appointmentTable = pgTable("appointment", {
-  id: serial("id").notNull().primaryKey(),
-  petId: integer("pet_id")
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
+  petId: uuid("pet_id")
     .notNull()
     .references(() => petTable.id),
-  vetId: integer("vet_id")
+  vetId: uuid("vet_id")
     .notNull()
     .references(() => userTable.id),
-  serviceId: integer("service_id")
+  serviceId: uuid("service_id")
     .notNull()
     .references(() => serviceTable.id),
-  userId: integer("user_id")
+  userId: uuid("user_id")
     .notNull()
     .references(() => userTable.id),
   date: timestamp("date", { withTimezone: true }).notNull(),
@@ -123,8 +132,8 @@ export type NewAppointment = typeof appointmentTable.$inferInsert;
 export const insertAppointmentSchema = createInsertSchema(appointmentTable);
 
 export const sessionTable = pgTable("session", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => userTable.id),
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").references(() => userTable.id),
   token: varchar("token", { length: 256 }),
   expiresAt: timestamp("expires_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),

@@ -28,10 +28,37 @@ export const env = createEnv({
     }),
 
     RESEND_API_KEY: z.string().optional(),
+    TWILIO_ACCOUNT_SID: z.string().min(1).optional(),
+    TWILIO_AUTH_TOKEN: z.string().min(1).optional(),
+    TWILIO_FROM_NUMBER: z.string().min(1).optional(),
+    TWILIO_DEFAULT_COUNTRY_CODE: z.string().min(1).default("+1"),
 
     REDIS_URL: z.string().url(),
     REDIS_TOKEN: z.string().min(1),
     REDIS_EXPIRES_IN_MINS: z.coerce.number().int().positive().default(5),
+    NOTIFICATION_QUEUE_KEY: z
+      .string()
+      .min(1)
+      .default("zoomies:notifications"),
+    NOTIFICATION_SCHEDULED_QUEUE_KEY: z
+      .string()
+      .min(1)
+      .default("zoomies:notifications:scheduled"),
+    NOTIFICATION_WORKER_POLL_INTERVAL_MS: z.coerce
+      .number()
+      .int()
+      .positive()
+      .default(1000),
+    NOTIFICATION_SCHEDULED_BATCH_SIZE: z.coerce
+      .number()
+      .int()
+      .positive()
+      .default(50),
+    APPOINTMENT_REMINDER_LEAD_MINUTES: z.coerce
+      .number()
+      .int()
+      .positive()
+      .default(60),
   },
   runtimeEnv: process.env,
 });

@@ -3,8 +3,11 @@ import { Router } from "express";
 import AppointmentController from "@controller/appointment";
 import { Routes } from "@/constants";
 import ValidationMiddleware from "@middleware/validation";
-import { getOneAppointmentSchema, updateAppointmentSchema } from "@/schemas";
-import { insertAppointmentSchema } from "@lib/db/schema";
+import {
+  createAppointmentSchema,
+  getOneAppointmentSchema,
+  updateAppointmentSchema,
+} from "@/schemas";
 import { authMiddleware, allowedRoles } from "@middleware/auth";
 
 export default class AppointmentRoute implements Routes {
@@ -19,7 +22,7 @@ export default class AppointmentRoute implements Routes {
   private initializeRoutes(): void {
     this.router.get(
       `${this.path}/`,
-      authMiddleware,
+      [authMiddleware, allowedRoles(["ADMIN"])],
       this.controller.getAllAppointments
     );
     this.router.get(
@@ -29,7 +32,7 @@ export default class AppointmentRoute implements Routes {
     );
     this.router.post(
       `${this.path}/`,
-      [authMiddleware, ValidationMiddleware(insertAppointmentSchema)],
+      [authMiddleware, ValidationMiddleware(createAppointmentSchema)],
       this.controller.createAppointment
     );
     this.router.patch(

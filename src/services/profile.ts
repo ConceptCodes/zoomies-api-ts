@@ -24,6 +24,7 @@ export default class ProfileService {
           email: userTable.email,
           role: userTable.role,
           id: userTable.id,
+          notificationPreferences: userTable.notificationPreferences,
         })
         .from(userTable)
         .where(eq(userTable.id, id))
@@ -37,14 +38,29 @@ export default class ProfileService {
     }
   }
 
-  public async update(data: Required<UpdateProfileSchema>): Promise<void> {
+  public async update(
+    id: User["id"],
+    data: UpdateProfileSchema
+  ): Promise<void> {
     try {
-      const { fullName, id } = data;
-
       const exist = await doesUserExist(id);
       if (!exist) throw new EntityNotFoundError("USER");
 
-      await db.update(userTable).set({ fullName }).where(eq(userTable.id, id));
+      const updates: Partial<User> = {};
+      if (data.fullName !== undefined) {
+        updates.fullName = data.fullName;
+      }
+      if (data.notificationPreferences !== undefined) {
+        updates.notificationPreferences = data.notificationPreferences as User["notificationPreferences"];
+      }
+
+      if (!Object.keys(updates).length) {
+        return;
+      }
+
+      updates.updatedAt = new Date();
+
+      await db.update(userTable).set(updates).where(eq(userTable.id, id));
     } catch (err) {
       throw err;
     }

@@ -4,6 +4,7 @@ import { EntityNotFoundError } from "@/exceptions";
 import { db } from "@lib/db";
 import { Appointment, appointmentTable } from "@lib/db/schema";
 import { CreateAppointmentSchema, UpdateAppointmentSchema } from "@/schemas";
+import { getNotificationPublisher } from "@service/notification";
 
 export default class AppointmentService {
   public async get(id: Appointment["id"]) {
@@ -44,10 +45,45 @@ export default class AppointmentService {
     }
   }
 
-  public async create(data: CreateAppointmentSchema): Promise<Appointment> {
+  public async create(
+    userId: Appointment["userId"],
+    data: CreateAppointmentSchema
+  ): Promise<Appointment> {
     try {
-      const tmp = await db.insert(appointmentTable).values(data).execute();
-      return tmp[0];
+      const appointmentPayload = { ...data, userId };
+
+      const inserted = await db
+        .insert(appointmentTable)
+        .values(appointmentPayload)
+        .returning();
+
+      const appointment = inserted[0];
+
+      if (!appointment) {
+        throw new EntityNotFoundError("Appointment Creation Failed");
+      }
+
+      try {
+        const publisher = getNotificationPublisher();
+        await publisher.scheduleAppointmentReminder(
+          {
+            appointmentId: appointment.id,
+            appointmentDate: appointment.date.toISOString(),
+            userId: appointment.userId,
+            vetId: appointment.vetId,
+            serviceId: appointment.serviceId,
+            petId: appointment.petId,
+          },
+          new Date(appointment.date)
+        );
+      } catch (error) {
+        console.error("Failed to schedule appointment reminder", {
+          appointmentId: appointment.id,
+          error,
+        });
+      }
+
+      return appointment;
     } catch (err) {
       throw err;
     }

@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 
 import VetService from "@service/vet";
+import { InvalidRole } from "@/exceptions";
+import type { CreateVetSchema, UpdateVetSchema } from "@/schemas";
 
 export default class VetController {
   private service: VetService;
@@ -21,7 +23,7 @@ export default class VetController {
 
   public async getVetById(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = Number(req.params.id);
+      const id = req.params.id;
       const vet = await this.service.getById(id);
       res.status(StatusCodes.OK).json(vet);
     } catch (error) {
@@ -29,9 +31,27 @@ export default class VetController {
     }
   }
 
+  public async createVet(req: Request, res: Response, next: NextFunction) {
+    try {
+      const payload = req.body as CreateVetSchema;
+      const vet = await this.service.create(payload);
+      res.status(StatusCodes.CREATED).json(vet);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   public async updateVetInfo(req: Request, res: Response, next: NextFunction) {
     try {
-      const vet = await this.service.update(req.body);
+      const targetUserId = req.params.id;
+      const isSelf = req.user.id === targetUserId;
+
+      if (!isSelf) {
+        throw new InvalidRole();
+      }
+
+      const payload = req.body as UpdateVetSchema;
+      const vet = await this.service.update(targetUserId, payload);
       res.status(StatusCodes.OK).json(vet);
     } catch (error) {
       next(error);

@@ -22,11 +22,8 @@ export default class PetController {
 
   public async getPetById(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = Number(req.params.id);
-      const pet = await this.service.getOne({
-        id,
-        ownerId: req.user.id,
-      });
+      const id = req.params.id;
+      const pet = await this.service.getOne(id, req.user.id);
       res.status(StatusCodes.OK).json(pet);
     } catch (error) {
       next(error);
@@ -36,10 +33,7 @@ export default class PetController {
   public async getPetsByType(req: Request, res: Response, next: NextFunction) {
     const type = req.params.type as Pet["type"];
     try {
-      const pets = await this.service.getAllByType({
-        type,
-        ownerId: req.user.id,
-      });
+      const pets = await this.service.getAllByType(type, req.user.id);
       res.status(StatusCodes.OK).json(pets);
     } catch (error) {
       next(error);
@@ -62,7 +56,10 @@ export default class PetController {
 
   public async updatePet(req: Request, res: Response, next: NextFunction) {
     try {
-      await this.service.update(req.body);
+      await this.service.update({
+        ...req.body,
+        ownerId: req.user.id,
+      });
       res.status(StatusCodes.NO_CONTENT).json({
         message: "Pet updated successfully",
       });
@@ -73,11 +70,8 @@ export default class PetController {
 
   public async deletePet(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = Number(req.params.id);
-      await this.service.delete({
-        id,
-        ownerId: req.user.id,
-      });
+      const id = req.params.id;
+      await this.service.delete(id, req.user.id);
       res.status(StatusCodes.NO_CONTENT).json({
         message: "Pet deleted successfully",
       });

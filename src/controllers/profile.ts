@@ -5,7 +5,7 @@ import ProfileService from "@service/profile";
 import { User, petTable, userTable } from "@/lib/db/schema";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { GetByTypePetSchema } from "@/schemas";
+import { GetByTypePetSchema, UpdateProfileSchema } from "@/schemas";
 
 export default class ProfileController {
   private service: ProfileService;
@@ -40,11 +40,8 @@ export default class ProfileController {
   public updateProfile = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.user;
-      const { fullName } = req.body;
-      await this.service.update({
-        id,
-        fullName,
-      });
+      const data = req.body as UpdateProfileSchema;
+      await this.service.update(id, data);
       res.status(StatusCodes.OK).send();
     } catch (err) {
       next(err);

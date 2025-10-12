@@ -3,8 +3,12 @@ import { Router } from "express";
 import VetController from "@controller/vet";
 import { Routes } from "@/constants";
 import ValidationMiddleware from "@middleware/validation";
-import { getOneVetSchema } from "@/schemas";
-import { authMiddleware } from "@middleware/auth";
+import {
+  createVetSchema,
+  getOneVetSchema,
+  updateVetSchema,
+} from "@/schemas";
+import { authMiddleware, allowedRoles } from "@middleware/auth";
 
 export default class VetRoute implements Routes {
   public path = "/vets";
@@ -25,6 +29,26 @@ export default class VetRoute implements Routes {
       `${this.path}/:id`,
       [authMiddleware, ValidationMiddleware(getOneVetSchema, "params")],
       this.controller.getVetById
+    );
+
+    this.router.post(
+      this.path,
+      [
+        authMiddleware,
+        allowedRoles(["ADMIN"]),
+        ValidationMiddleware(createVetSchema),
+      ],
+      this.controller.createVet
+    );
+
+    this.router.patch(
+      `${this.path}/:id`,
+      [
+        authMiddleware,
+        ValidationMiddleware(getOneVetSchema, "params"),
+        ValidationMiddleware(updateVetSchema),
+      ],
+      this.controller.updateVetInfo
     );
   }
 }

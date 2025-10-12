@@ -2,14 +2,10 @@ import { eq, and } from "drizzle-orm";
 
 import { db } from "@lib/db";
 import { Pet, User, petTable } from "@lib/db/schema";
-import type {
-  CreatePetSchema,
-  GetByTypePetSchema,
-  GetOnePetSchema,
-  UpdatePetSchema,
-} from "@/schemas";
+import type { CreatePetSchema, UpdatePetSchema } from "@/schemas";
 import { doesUserExist } from "@/utils/auth";
 import { EntityNotFoundError } from "@/exceptions";
+import { takeFirst } from "@/utils";
 
 export default class PetService {
   public async getAll(userId: User["id"]): Promise<Pet[]> {
@@ -24,23 +20,33 @@ export default class PetService {
     }
   }
 
-  public async getOne(data: GetOnePetSchema): Promise<Pet> {
+  public async getOne(
+    id: Pet["id"],
+    ownerId: Pet["ownerId"]
+  ): Promise<Pet> {
     try {
-      const { id, ownerId } = data;
       const pet = await db
         .select()
         .from(petTable)
         .where(and(eq(petTable.ownerId, ownerId), eq(petTable.id, id)))
         .limit(1);
-      return pet[0];
+
+      const entity = takeFirst(pet);
+      if (!entity) {
+        throw new EntityNotFoundError("PET");
+      }
+
+      return entity;
     } catch (error) {
       throw error;
     }
   }
 
-  public async getAllByType(data: GetByTypePetSchema): Promise<Pet[]> {
+  public async getAllByType(
+    type: Pet["type"],
+    ownerId: Pet["ownerId"]
+  ): Promise<Pet[]> {
     try {
-      const { type, ownerId } = data;
       const pets = await db
         .select()
         .from(petTable)
@@ -65,23 +71,36 @@ export default class PetService {
   public async update(data: UpdatePetSchema): Promise<void> {
     try {
       const { id, ownerId, ...rest } = data;
-      await db
+      if (!id || !ownerId) throw new EntityNotFoundError("PET");
+      const updates = {
+        ...rest,
+        updatedAt: new Date(),
+      };
+
+      const result = await db
         .update(petTable)
-        .set(rest)
-        .where(
-          and(eq(petTable.ownerId, ownerId || 0), eq(petTable.id, id || 0))
-        );
+        .set(updates)
+        .where(and(eq(petTable.ownerId, ownerId), eq(petTable.id, id)))
+        .returning({ id: petTable.id });
+
+      if (!takeFirst(result)) {
+        throw new EntityNotFoundError("PET");
+      }
     } catch (error) {
       throw error;
     }
   }
 
-  public async delete(data: GetOnePetSchema): Promise<void> {
+  public async delete(id: Pet["id"], ownerId: Pet["ownerId"]): Promise<void> {
     try {
-      const { id, ownerId } = data;
-      await db
+      const deleted = await db
         .delete(petTable)
-        .where(and(eq(petTable.ownerId, ownerId || 0), eq(petTable.id, id)));
+        .where(and(eq(petTable.ownerId, ownerId), eq(petTable.id, id)))
+        .returning({ id: petTable.id });
+
+      if (!takeFirst(deleted)) {
+        throw new EntityNotFoundError("PET");
+      }
     } catch (error) {
       throw error;
     }
