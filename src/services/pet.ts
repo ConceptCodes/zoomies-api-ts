@@ -20,10 +20,7 @@ export default class PetService {
     }
   }
 
-  public async getOne(
-    id: Pet["id"],
-    ownerId: Pet["ownerId"]
-  ): Promise<Pet> {
+  public async getOne(id: Pet["id"], ownerId: Pet["ownerId"]): Promise<Pet> {
     try {
       const pet = await db
         .select()
@@ -59,10 +56,18 @@ export default class PetService {
 
   public async create(data: CreatePetSchema): Promise<void> {
     try {
-      const exist = await doesUserExist(data.ownerId);
+      const ownerId = data.ownerId;
+      if (!ownerId) throw new Error("Owner ID is required");
+
+      const exist = await doesUserExist(ownerId);
       if (!exist) throw new EntityNotFoundError("USER");
 
-      await db.insert(petTable).values(data);
+      await db.insert(petTable).values({
+        name: data.name,
+        age: data.age,
+        type: data.type,
+        ownerId,
+      });
     } catch (error) {
       throw error;
     }

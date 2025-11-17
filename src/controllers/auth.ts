@@ -45,7 +45,11 @@ export default class AuthController {
     }
   };
 
-  public verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
+  public verifyEmail = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       await this.service.verifyEmail(req.body);
       res.status(StatusCodes.OK).send({
@@ -54,13 +58,45 @@ export default class AuthController {
     } catch (err) {
       next(err);
     }
-  }
+  };
 
   public logout = async (req: Request, res: Response, next: NextFunction) => {
     try {
       await this.service.logout(req.user.id);
       res.clearCookie(REFRESH_TOKEN_COOKIE_NAME);
       res.status(StatusCodes.OK).send();
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  public forgotPassword = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      await this.service.forgotPassword(req.body);
+      res.status(StatusCodes.OK).json({
+        message:
+          "If an account with that email exists, a password reset code has been sent.",
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  public resetPassword = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      await this.service.resetPassword(req.body);
+      res.status(StatusCodes.OK).json({
+        message:
+          "Password reset successfully. Please login with your new password.",
+      });
     } catch (err) {
       next(err);
     }

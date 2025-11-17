@@ -64,19 +64,23 @@ export class RedisQueue<TPayload> implements MessageQueue<TPayload> {
 
   private async flushScheduledMessages(): Promise<void> {
     const now = Date.now();
-    const due =
-      (await this.redis.zrange<string>(
-        this.options.scheduledKey,
-        0,
-        now,
-        {
-          byScore: true,
-          limit: {
-            offset: 0,
-            count: this.options.scheduledBatchSize,
-          },
-        }
-      )) ?? [];
+    // Get all scheduled messages up to current time
+    const allScheduled =
+      (await this.redis.zrange(this.options.scheduledKey, 0, -1, {
+        withScores: true,
+      })) ?? [];
+
+    // Filter messages that are due
+    const due = allScheduled
+      .filter((item: any) => {
+        const [, score] = item;
+        return score <= now;
+      })
+      .slice(0, this.options.scheduledBatchSize)
+      .map((item: any) => {
+        const [message] = item;
+        return message;
+      });
 
     if (!due.length) return;
 
@@ -103,9 +107,7 @@ export class RedisQueue<TPayload> implements MessageQueue<TPayload> {
     });
   }
 
-  private serialize(
-    message: QueueMessage<TPayload> & { id: string }
-  ): string {
+  private serialize(message: QueueMessage<TPayload> & { id: string }): string {
     const payload: SerializedMessage = {
       id: message.id,
       payload: message.payload,

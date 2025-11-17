@@ -1,9 +1,6 @@
 import { and, eq } from "drizzle-orm";
 
-import {
-  EntityNotFoundError,
-  InvalidRole,
-} from "@/exceptions";
+import { EntityNotFoundError, InvalidRole } from "@/exceptions";
 import { db } from "@lib/db";
 import {
   Appointment,
@@ -16,10 +13,7 @@ import {
   serviceTable,
   vetTable,
 } from "@lib/db/schema";
-import {
-  CreateAppointmentSchema,
-  UpdateAppointmentSchema,
-} from "@/schemas";
+import { CreateAppointmentSchema, UpdateAppointmentSchema } from "@/schemas";
 import { getNotificationPublisher } from "@service/notification";
 import { takeFirst } from "@/utils";
 import { UserPayload } from "@/constants";
@@ -88,14 +82,19 @@ export default class AppointmentService {
     data: UpdateAppointmentSchema
   ): Promise<Appointment> {
     try {
+      if (!data.id) throw new Error("Appointment ID is required for update");
       const existing = await this.findByIdOrThrow(data.id);
       this.assertAccess(existing, requester);
 
       await this.assertPetOwnership(data.petId, existing.userId);
       await this.assertServiceExists(data.serviceId);
 
+      if (!data.id) throw new Error("Appointment ID is required for update");
+
       const updates = {
-        ...data,
+        petId: data.petId,
+        serviceId: data.serviceId,
+        date: data.date,
         updatedAt: new Date(),
       };
 
@@ -126,10 +125,7 @@ export default class AppointmentService {
     }
   }
 
-  private assertAccess(
-    appointment: Appointment,
-    requester: UserPayload
-  ): void {
+  private assertAccess(appointment: Appointment, requester: UserPayload): void {
     if (requester.role === "ADMIN") return;
     if (appointment.userId !== requester.id) {
       throw new InvalidRole();

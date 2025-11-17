@@ -2,7 +2,13 @@ import { Router } from "express";
 import rateLimit from "express-rate-limit";
 import AuthController from "@controller/auth";
 import { Routes } from "@/constants";
-import { loginSchema, registerSchema, verifyEmailSchema } from "@/schemas";
+import {
+  forgotPasswordSchema,
+  loginSchema,
+  registerSchema,
+  resetPasswordSchema,
+  verifyEmailSchema,
+} from "@/schemas";
 import ValidationMiddleware from "@middleware/validation";
 
 export default class AuthRoute implements Routes {
@@ -40,6 +46,18 @@ export default class AuthRoute implements Routes {
       this.authLimiter,
       ValidationMiddleware(verifyEmailSchema),
       this.controller.verifyEmail
+    );
+    this.router.post(
+      `${this.path}/forgot-password`,
+      this.authLimiter,
+      ValidationMiddleware(forgotPasswordSchema),
+      this.controller.forgotPassword
+    );
+    this.router.post(
+      `${this.path}/reset-password`,
+      this.authLimiter,
+      ValidationMiddleware(resetPasswordSchema),
+      this.controller.resetPassword
     );
   }
 }

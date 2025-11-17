@@ -27,19 +27,22 @@ export const env = createEnv({
       return x.endsWith("m") || x.endsWith("h") || x.endsWith("d");
     }),
 
-    RESEND_API_KEY: z.string().optional(),
+    RESEND_API_KEY: z.string().min(1).optional(),
     TWILIO_ACCOUNT_SID: z.string().min(1).optional(),
     TWILIO_AUTH_TOKEN: z.string().min(1).optional(),
     TWILIO_FROM_NUMBER: z.string().min(1).optional(),
     TWILIO_DEFAULT_COUNTRY_CODE: z.string().min(1).default("+1"),
 
+    // Polar Payment Integration
+    POLAR_API_KEY: z.string().min(1).optional(),
+    POLAR_WEBHOOK_SECRET: z.string().min(1).optional(),
+    POLAR_SUCCESS_URL: z.string().url().optional(),
+    POLAR_CANCEL_URL: z.string().url().optional(),
+
     REDIS_URL: z.string().url(),
     REDIS_TOKEN: z.string().min(1),
     REDIS_EXPIRES_IN_MINS: z.coerce.number().int().positive().default(5),
-    NOTIFICATION_QUEUE_KEY: z
-      .string()
-      .min(1)
-      .default("zoomies:notifications"),
+    NOTIFICATION_QUEUE_KEY: z.string().min(1).default("zoomies:notifications"),
     NOTIFICATION_SCHEDULED_QUEUE_KEY: z
       .string()
       .min(1)
@@ -62,3 +65,18 @@ export const env = createEnv({
   },
   runtimeEnv: process.env,
 });
+
+// Validate critical environment variables for production
+export function validateProductionEnv(): void {
+  if (env.NODE_ENV === "production") {
+    if (!env.RESEND_API_KEY) {
+      throw new Error("RESEND_API_KEY is required in production");
+    }
+    if (!env.REDIS_URL) {
+      throw new Error("REDIS_URL is required in production");
+    }
+    if (!env.REDIS_TOKEN) {
+      throw new Error("REDIS_TOKEN is required in production");
+    }
+  }
+}

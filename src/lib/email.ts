@@ -63,12 +63,12 @@ const templates: Email = {
       return loadTemplate("appointment-reminder", data);
     },
   },
-  // resetPassword: {
-  //   subject: "Reset your password",
-  //   component: (data) => {
-  //     return loadTemplate("reset-password", data);
-  //   },
-  // },
+  resetPassword: {
+    subject: "Reset your password",
+    component: (data) => {
+      return loadTemplate("reset-password", data);
+    },
+  },
 };
 
 export type Template = keyof typeof templates;

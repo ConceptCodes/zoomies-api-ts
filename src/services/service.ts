@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 
 import { db } from "@lib/db";
-import { Service, serviceTable } from "@lib/db/schema";
+import { Service, serviceTable, NewService } from "@lib/db/schema";
 import { CreateServiceSchema, UpdateServiceSchema } from "@/schemas";
 
 export default class ServiceService {
@@ -28,12 +28,40 @@ export default class ServiceService {
 
   public async create(data: CreateServiceSchema): Promise<Service> {
     try {
+      // Ensure applicablePetTypes is an array and validate values
+      const petTypesArray = Array.isArray(data.applicablePetTypes)
+        ? data.applicablePetTypes
+        : [data.applicablePetTypes];
+
+      const validPetTypes = [
+        "dog",
+        "cat",
+        "bird",
+        "hamster",
+        "unknown",
+        "fish",
+        "rabbit",
+        "turtle",
+        "snake",
+        "lizard",
+        "guinea_pig",
+        "horse",
+        "goat",
+      ] as const;
+      const filteredPetTypes = petTypesArray.filter((petType: any) =>
+        validPetTypes.includes(petType)
+      ) as NewService["applicablePetTypes"];
+
+      const serviceData: NewService = {
+        name: data.name,
+        description: data.description || null,
+        applicablePetTypes: filteredPetTypes,
+        price: data.price || 100,
+      };
+
       const service = await db
         .insert(serviceTable)
-        .values({
-          ...data,
-          applicablePetTypes: data.applicablePetTypes as any, // TODO: Fix this
-        })
+        .values(serviceData)
         .returning();
       return service[0];
     } catch (err) {

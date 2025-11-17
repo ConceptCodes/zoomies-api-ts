@@ -9,7 +9,7 @@ import errorMiddleware from "@middleware/error";
 import notFoundMiddleware from "@middleware/notfound";
 import traceIdMiddleware from "@middleware/trace";
 import { Routes } from "@/constants";
-import { env } from "@lib/env";
+import { env, validateProductionEnv } from "@lib/env";
 import { connectToRedis } from "@lib/redis";
 import { initializeNotificationModule } from "@service/notification";
 
@@ -19,6 +19,9 @@ class App {
   public env: string;
 
   constructor(routes: Routes[]) {
+    // Validate environment variables
+    validateProductionEnv();
+
     this.app = express();
     this.port = env.PORT;
     this.env = env.NODE_ENV || "production";

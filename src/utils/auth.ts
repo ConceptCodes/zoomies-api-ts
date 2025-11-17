@@ -20,7 +20,7 @@ export const verifyOTPCode = async (
   const key = getOtpKey(data.email);
   const value = await get(key);
   console.log(value, data.code);
-  return value == data.code;
+  return value === data.code;
 };
 
 export const doesUserExist = async (id: User["id"]): Promise<boolean> => {

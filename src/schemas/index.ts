@@ -1,8 +1,6 @@
 import { z } from "zod";
-import { createInsertSchema } from "drizzle-zod";
 
 import {
-  userTable,
   insertUserSchema,
   insertPetSchema,
   insertServiceSchema,
@@ -26,14 +24,14 @@ export const registerSchema = insertUserSchema
   })
   .required();
 
-export const forgotPasswordSchema = insertUserSchema.pick({
-  id: true,
-  email: true,
+export const forgotPasswordSchema = z.object({
+  email: z.string().email(),
 });
 
-export const resetPasswordSchema = insertUserSchema.pick({
-  id: true,
-  password: true,
+export const resetPasswordSchema = z.object({
+  email: z.string().email(),
+  code: z.string().length(6),
+  password: z.string().min(8),
 });
 
 // Profile
@@ -52,7 +50,8 @@ export const updateProfileSchema = z
     notificationPreferences: notificationPreferencesSchema.optional(),
   })
   .refine(
-    (data) => data.fullName !== undefined || data.notificationPreferences !== undefined,
+    (data) =>
+      data.fullName !== undefined || data.notificationPreferences !== undefined,
     {
       message: "At least one field must be provided",
     }
@@ -167,7 +166,9 @@ export type RegisterSchema = z.infer<typeof registerSchema>;
 export type VerifyEmailSchema = z.infer<typeof verifyEmailSchema>;
 
 export type UpdateProfileSchema = z.infer<typeof updateProfileSchema>;
-export type NotificationPreferencesSchema = z.infer<typeof notificationPreferencesSchema>;
+export type NotificationPreferencesSchema = z.infer<
+  typeof notificationPreferencesSchema
+>;
 
 export type GetOnePetSchema = z.infer<typeof getOnePetSchema>;
 export type GetByTypePetSchema = z.infer<typeof getByTypePetSchema>;

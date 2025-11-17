@@ -14,12 +14,18 @@ import type {
   ForgotPasswordSchema,
   LoginSchema,
   RegisterSchema,
+  ResetPasswordSchema,
   VerifyEmailSchema,
 } from "@/schemas";
 import { env } from "@lib/env";
 import { UserPayload } from "@/constants";
 import { generateOTPCode, verifyOTPCode } from "@/utils/auth";
-import { VerifyEmailData, WelcomeEmailData, sendEmail } from "@/lib/email";
+import {
+  ResetPasswordEmailData,
+  VerifyEmailData,
+  WelcomeEmailData,
+  sendEmail,
+} from "@/lib/email";
 import { takeFirstOrThrow } from "@/utils";
 
 type Tokens = {
@@ -156,11 +162,70 @@ export default class AuthService {
     }
   }
 
-  public async forgotPassword(data: ForgotPasswordSchema): Promise<any> {
-    // TODO: implement forgotPassword
+  public async forgotPassword(data: ForgotPasswordSchema): Promise<void> {
     try {
-      console.log(data);
-    } catch (err) {}
+      const { email } = data;
+
+      // Check if user exists
+      const users = await db
+        .select()
+        .from(userTable)
+        .where(eq(userTable.email, email))
+        .limit(1);
+
+      if (!users[0]) {
+        // Don't reveal if email exists or not for security
+        return;
+      }
+
+      // Generate and send reset code
+      const code = await generateOTPCode(email);
+      const payload: ResetPasswordEmailData = { code };
+      await sendEmail(email, "resetPassword", payload);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
+
+  public async resetPassword(data: ResetPasswordSchema): Promise<void> {
+    try {
+      const { email, code, password } = data;
+
+      // Verify the reset code
+      const isVerified = await verifyOTPCode({ email, code });
+      if (!isVerified) {
+        throw new InvalidToken();
+      }
+
+      // Hash the new password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Update the user's password
+      await db
+        .update(userTable)
+        .set({
+          password: hashedPassword,
+          updatedAt: new Date(),
+        })
+        .where(eq(userTable.email, email));
+
+      // Invalidate all existing sessions for this user
+      const user = await db
+        .select()
+        .from(userTable)
+        .where(eq(userTable.email, email))
+        .limit(1);
+
+      if (user[0]) {
+        await db
+          .delete(sessionTable)
+          .where(eq(sessionTable.userId, user[0].id));
+      }
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
   }
 
   private generateToken(data: UserPayload): Tokens {

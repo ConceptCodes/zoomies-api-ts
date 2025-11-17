@@ -37,7 +37,16 @@ export default class VetService {
 
   public async create(data: CreateVetSchema): Promise<Vet> {
     try {
-      const created = await db.insert(vetTable).values(data).returning();
+      const vetData = {
+        userId: data.userId,
+        allowedPetTypes:
+          data.allowedPetTypes as unknown as Vet["allowedPetTypes"],
+        startHour: data.startHour,
+        endHour: data.endHour,
+        days: data.days,
+      };
+
+      const created = await db.insert(vetTable).values(vetData).returning();
       const vet = takeFirst(created);
       if (!vet) {
         throw new EntityNotFoundError("VET");
