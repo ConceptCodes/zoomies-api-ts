@@ -6,6 +6,9 @@ import {
   insertServiceSchema,
   insertAppointmentSchema,
   insertVetSchema,
+  insertPaymentSchema,
+  insertSubscriptionSchema,
+  insertTransactionSchema,
 } from "@lib/db/schema";
 import { notificationChannels } from "@lib/notifications/types";
 
@@ -148,6 +151,42 @@ export const updateAppointmentSchema = insertAppointmentSchema.pick({
   petId: true,
   serviceId: true,
   date: true,
+});
+
+// Payment Schemas
+export const createPaymentSchema = insertPaymentSchema.pick({
+  userId: true,
+  appointmentId: true,
+  amount: true,
+  currency: true,
+});
+
+export const createSubscriptionSchema = insertSubscriptionSchema.pick({
+  userId: true,
+  polarProductId: true,
+  polarSubscriptionId: true,
+  status: true,
+});
+
+export const createTransactionSchema = insertTransactionSchema.pick({
+  paymentId: true,
+  type: true,
+  amount: true,
+  currency: true,
+  status: true,
+  metadata: true,
+});
+
+export const updatePaymentSchema = insertPaymentSchema.pick({
+  id: true,
+  status: true,
+});
+
+export const updateSubscriptionSchema = insertSubscriptionSchema.pick({
+  id: true,
+  status: true,
+  currentPeriodStart: true,
+  currentPeriodEnd: true,
 });
 
 export const getOneAppointmentSchema = insertAppointmentSchema.pick({

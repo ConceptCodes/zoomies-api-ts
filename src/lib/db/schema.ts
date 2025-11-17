@@ -140,3 +140,60 @@ export const sessionTable = pgTable("session", {
 });
 
 export type Session = typeof sessionTable.$inferSelect;
+
+// Payment Tables
+export const paymentTable = pgTable("payment", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => userTable.id),
+  appointmentId: uuid("appointment_id")
+    .notNull()
+    .references(() => appointmentTable.id),
+  amount: integer("amount").notNull(),
+  currency: varchar("currency", { length: 3 }).default("USD"),
+  status: varchar("status", { length: 20 }).notNull(), // pending, completed, failed, refunded
+  polarPaymentId: varchar("polar_payment_id", { length: 256 }),
+  polarCheckoutId: varchar("polar_checkout_id", { length: 256 }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const subscriptionTable = pgTable("subscription", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => userTable.id),
+  polarProductId: varchar("polar_product_id", { length: 256 }).notNull(),
+  polarSubscriptionId: varchar("polar_subscription_id", { length: 256 }),
+  status: varchar("status", { length: 20 }).notNull(), // active, cancelled, expired
+  currentPeriodStart: timestamp("current_period_start"),
+  currentPeriodEnd: timestamp("current_period_end"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const transactionTable = pgTable("transaction", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  paymentId: uuid("payment_id")
+    .notNull()
+    .references(() => paymentTable.id),
+  type: varchar("type", { length: 20 }).notNull(), // payment, refund, subscription_payment
+  amount: integer("amount").notNull(),
+  currency: varchar("currency", { length: 3 }).default("USD"),
+  status: varchar("status", { length: 20 }).notNull(), // pending, completed, failed
+  polarTransactionId: varchar("polar_transaction_id", { length: 256 }),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type Payment = typeof paymentTable.$inferSelect;
+export type NewPayment = typeof paymentTable.$inferInsert;
+export type Subscription = typeof subscriptionTable.$inferSelect;
+export type NewSubscription = typeof subscriptionTable.$inferInsert;
+export type Transaction = typeof transactionTable.$inferSelect;
+export type NewTransaction = typeof transactionTable.$inferInsert;
+export const insertPaymentSchema = createInsertSchema(paymentTable);
+export const insertSubscriptionSchema = createInsertSchema(subscriptionTable);
+export const insertTransactionSchema = createInsertSchema(transactionTable);
